@@ -112,7 +112,7 @@ export default function Home() {
         }}
       >
         <div className="relative grid items-start gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
-          <RevealOnScroll className="min-w-0 space-y-5 lg:col-span-5">
+          <RevealOnScroll className="min-w-0 space-y-5 overflow-x-clip lg:col-span-5">
             <p className="inline-flex rounded-full bg-[#cbecd0] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#354a38]">
               Purpose-built for IMG clinical exposure
             </p>
@@ -147,21 +147,21 @@ export default function Home() {
             delayMs={150}
             className="relative z-10 min-w-0 lg:col-span-7"
           >
+            {/* Sage wash only — no white mat, no inset highlights, image flush to inner crop */}
             <div
-              className="rounded-2xl bg-gradient-to-br from-[#b8cfba] via-[#d0dfd2] to-[#e4eee6] p-2 sm:rounded-[1.75rem] sm:p-2.5 md:p-3"
+              className="rounded-2xl bg-gradient-to-br from-[#8aab8f] via-[#759d7b] to-[#628568] p-3 sm:rounded-3xl sm:p-4 md:p-5"
               style={{
                 boxShadow:
-                  "0 0 0 1px rgba(117, 157, 123, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 20px 48px -16px rgba(53, 74, 56, 0.22), 0 0 72px 20px rgba(117, 157, 123, 0.22)",
+                  "0 24px 56px -20px rgba(44, 61, 47, 0.35), 0 0 0 1px rgba(53, 74, 56, 0.12)",
               }}
             >
-              {/* Match poster edge (#759d7b) so file white margins read as sage, not white */}
-              <div className="overflow-hidden rounded-[1.25rem] bg-[#759d7b] ring-1 ring-[#5f7362]/20 sm:rounded-[1.4rem]">
+              <div className="overflow-hidden rounded-xl bg-[#759d7b] sm:rounded-2xl">
                 <Image
                   src="/clinical-network-poster.png"
                   alt="VitalRounds: A New Era in Medical Rounds"
-                  width={1920}
-                  height={960}
-                  className="block h-auto w-full [clip-path:inset(1.25%_round_0.75rem)] sm:[clip-path:inset(1%_round_0.85rem)]"
+                  width={1024}
+                  height={524}
+                  className="block h-auto w-full align-middle"
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   priority
                 />
