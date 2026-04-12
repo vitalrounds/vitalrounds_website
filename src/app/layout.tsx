@@ -12,14 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Tab icon: `icon.png` + `apple-icon.png` in this folder (App Router file convention).
+// Avoid `favicon.ico` here — browsers prefer it and it was still the default triangle.
 export const metadata: Metadata = {
   title: "VitalRounds",
   description:
     "VitalRounds supports international medical graduates with structured clinical observerships and professional training in Australian healthcare settings.",
-  icons: {
-    icon: [{ url: "/short-logo.png", type: "image/png" }],
-    apple: "/short-logo.png",
-  },
 };
 
 export default function RootLayout({
