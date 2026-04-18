@@ -266,7 +266,8 @@ export default function WaitlistForm() {
         <p className="text-lg font-semibold text-[#2c3d2f]">You&apos;re on the list.</p>
         <p className="mt-3 text-sm leading-7 text-[#6e706e]">
           Thanks for completing the wait list form. Our team will be in touch when positions
-          open that match your profile.
+          open that match your profile. We also sent an email to help you set up your account
+          password.
         </p>
         <Link
           href="/"

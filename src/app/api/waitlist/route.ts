@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 const WAITLIST_BUCKET = process.env.WAITLIST_STORAGE_BUCKET ?? "waitlist-documents";
+const RESEND_API_URL = "https://api.resend.com/emails";
 
 type UploadInfo = {
   key: string;
@@ -28,6 +29,100 @@ function sanitizeFileName(name: string): string {
     .replace(/[^a-zA-Z0-9._-]/g, "")
     .replace(/-+/g, "-")
     .toLowerCase();
+}
+
+function getApplicantDetails(parsed: unknown) {
+  const details = (parsed as { details?: Record<string, unknown> }).details;
+  const emailRaw = details?.email;
+  const nameRaw = details?.fullLegalName;
+  const applicantEmail =
+    typeof emailRaw === "string" && emailRaw.trim() ? emailRaw.trim().toLowerCase() : null;
+  const applicantName = typeof nameRaw === "string" && nameRaw.trim() ? nameRaw.trim() : null;
+  return { details, applicantEmail, applicantName };
+}
+
+function buildAppOrigin(req: Request) {
+  const configured = process.env.APP_ORIGIN?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+  return new URL(req.url).origin;
+}
+
+async function sendWaitlistConfirmationEmail(opts: {
+  to: string;
+  name: string | null;
+}) {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.WAITLIST_FROM_EMAIL?.trim();
+  if (!apiKey || !from) {
+    console.warn(
+      "[waitlist] confirmation email skipped: missing RESEND_API_KEY or WAITLIST_FROM_EMAIL"
+    );
+    return;
+  }
+
+  const name = opts.name ?? "there";
+  const replyTo = process.env.WAITLIST_REPLY_TO?.trim() || undefined;
+
+  const html = `
+    <p>Hi ${name},</p>
+    <p>Thanks for joining the VitalRounds wait list.</p>
+    <p>We have received your details and will contact you once your turn is up.</p>
+    <p>Kind regards,<br/>VitalRounds Team</p>
+  `;
+
+  const res = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [opts.to],
+      reply_to: replyTo ? [replyTo] : undefined,
+      subject: "You have joined the VitalRounds wait list",
+      html,
+      text: `Hi ${name},\n\nThanks for joining the VitalRounds wait list.\nWe have received your details and will contact you once your turn is up.\n\nKind regards,\nVitalRounds Team`,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`resend_failed:${res.status}:${body}`);
+  }
+}
+
+async function provisionApplicantAccount(opts: {
+  admin: ReturnType<typeof createServiceRoleClient>;
+  email: string;
+  fullName: string | null;
+  req: Request;
+}) {
+  const redirectTo = `${buildAppOrigin(opts.req)}/auth/callback?next=/customer/dashboard`;
+
+  const invite = await opts.admin.auth.admin.inviteUserByEmail(opts.email, {
+    redirectTo,
+    data: {
+      role: "customer",
+      source: "waitlist",
+      full_name: opts.fullName ?? undefined,
+    },
+  });
+
+  if (!invite.error) return;
+
+  const msg = invite.error.message.toLowerCase();
+  const userExists =
+    msg.includes("already") || msg.includes("exists") || msg.includes("registered");
+  if (!userExists) {
+    throw new Error(`invite_failed:${invite.error.message}`);
+  }
+
+  // Existing user: send password setup/reset email so they can finish onboarding.
+  const reset = await opts.admin.auth.resetPasswordForEmail(opts.email, { redirectTo });
+  if (reset.error) {
+    throw new Error(`password_setup_failed:${reset.error.message}`);
+  }
 }
 
 async function uploadFiles(admin: ReturnType<typeof createServiceRoleClient>, form: FormData, submissionId: string) {
@@ -107,9 +202,7 @@ export async function POST(req: Request) {
         const submissionId = crypto.randomUUID();
         const uploaded = await uploadFiles(admin, form, submissionId);
         const filesObject = Object.fromEntries(uploaded.map((f) => [f.key, f]));
-        const details = (parsed as { details?: { email?: string } }).details;
-        const applicantEmail =
-          typeof details?.email === "string" ? details.email.trim() : null;
+        const { applicantEmail, applicantName } = getApplicantDetails(parsed);
 
         const { error: insertError } = await admin.from("waitlist_submissions").insert({
           id: submissionId,
@@ -125,6 +218,26 @@ export async function POST(req: Request) {
             { error: "Could not save submission. Try again later." },
             { status: 503 }
           );
+        }
+
+        if (applicantEmail) {
+          try {
+            await Promise.all([
+              sendWaitlistConfirmationEmail({
+                to: applicantEmail,
+                name: applicantName,
+              }),
+              provisionApplicantAccount({
+                admin,
+                email: applicantEmail,
+                fullName: applicantName,
+                req,
+              }),
+            ]);
+          } catch (notifyError) {
+            // Submission is already persisted; keep success response but log provisioning issues.
+            console.error("[waitlist] account/email workflow", notifyError);
+          }
         }
       } catch (e) {
         console.error("[waitlist] persistence", e);
