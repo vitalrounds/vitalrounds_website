@@ -87,8 +87,9 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       }
     } catch {
       setMessage("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

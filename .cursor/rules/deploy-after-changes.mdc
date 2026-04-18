@@ -1,0 +1,16 @@
+---
+description: After code changes, commit and push to main so Vercel deploys without the user asking.
+alwaysApply: true
+---
+
+# Deploy workflow (VitalRounds)
+
+When you finish a task that changes application source, configuration used by the app, or SQL shipped in `sql/`:
+
+1. **Commit and push** to `main` so **Git-linked Vercel** deploys production (unless the user explicitly says not to push or only wants local changes).
+2. **Include** only repo-relevant paths: `src/`, `public/` (if changed), `sql/`, config files such as `package.json`, `next.config.*`, `.env.example`, `.cursor/rules/`.
+3. **Exclude** from commits unless the user asks: large binary assets, `Website Content/`, invoices, personal folders, secrets (never commit `.env.local`).
+4. Use a short, clear commit message describing what changed.
+5. If `git push` fails (auth/network), report the error and what remains unpushed—do not assume deploy happened.
+
+Do not wait for the user to say “please deploy” if they have asked for ongoing automatic deployment (this rule).

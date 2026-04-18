@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const items = [
   { href: "/control", label: "Overview" },
   { href: "/control/waitlist", label: "Wait list" },
+  { href: "/control/partners", label: "Partners" },
 ] as const;
 
 export function ControlSidebar() {
@@ -26,6 +27,7 @@ export function ControlSidebar() {
             <Link
               key={href}
               href={href}
+              prefetch={false}
               className={
                 active
                   ? "rounded-lg bg-[#354a38] px-3 py-2 text-sm font-medium text-white"

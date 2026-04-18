@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseCookieOptions } from "@/lib/supabase/cookie-options";
 
 function isEmailAllowedAdmin(email: string | undefined): boolean {
   if (!email) return false;
@@ -41,6 +43,32 @@ function copyCookies(from: NextResponse, to: NextResponse) {
   });
 }
 
+function copyAuthHeaders(from: NextResponse, to: NextResponse) {
+  for (const key of ["cache-control", "expires", "pragma"] as const) {
+    const value = from.headers.get(key);
+    if (value) to.headers.set(key, value);
+  }
+}
+
+function mergeResponseMeta(from: NextResponse, to: NextResponse) {
+  copyCookies(from, to);
+  copyAuthHeaders(from, to);
+}
+
+async function getUserForGate(supabase: SupabaseClient) {
+  await supabase.auth.getSession();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (user) return user;
+  if (!error) return null;
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.user ?? null;
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -48,12 +76,15 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+  const cookieOptions = getSupabaseCookieOptions();
+
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookieOptions,
     cookies: {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) =>
           request.cookies.set(name, value)
         );
@@ -61,13 +92,16 @@ export async function updateSession(request: NextRequest) {
         cookiesToSet.forEach(({ name, value, options }) =>
           supabaseResponse.cookies.set(name, value, options)
         );
+        if (headers) {
+          Object.entries(headers).forEach(([key, value]) =>
+            supabaseResponse.headers.set(key, value)
+          );
+        }
       },
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUserForGate(supabase);
 
   const host = getHost(request);
   const pathname = request.nextUrl.pathname;
@@ -75,7 +109,7 @@ export async function updateSession(request: NextRequest) {
 
   const redirectWithSession = (url: URL) => {
     const redirectResponse = NextResponse.redirect(url);
-    copyCookies(supabaseResponse, redirectResponse);
+    mergeResponseMeta(supabaseResponse, redirectResponse);
     return redirectResponse;
   };
 
