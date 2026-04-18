@@ -94,12 +94,12 @@ export default function Home() {
           >
             Platform Roles
           </a>
-          <a
-            href="mailto:admin@vitalrounds.com.au?subject=Book%20a%20Discovery%20Call"
+          <Link
+            href="/waitlist"
             className="rounded-full bg-[#759d7b] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#5f7362]"
           >
-            Book a Call
-          </a>
+            Join the wait list
+          </Link>
         </div>
       </section>
 
