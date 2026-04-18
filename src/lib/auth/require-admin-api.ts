@@ -25,15 +25,13 @@ function bearerFromRequest(req: Request) {
 
 export async function requireAdminForApi(req: Request) {
   const auth = await createServerSupabaseClient();
-  await auth.auth.getSession();
-  const {
-    data: { user: verifiedUser },
-  } = await auth.auth.getUser();
   const {
     data: { session },
   } = await auth.auth.getSession();
 
-  let user = verifiedUser ?? session?.user ?? null;
+  // Route handlers should prefer session-based user from cookies.
+  // Avoid forcing refresh/user verification here to prevent transient auth churn.
+  let user = session?.user ?? null;
 
   // Fallback: if cookie-based auth is missing in this request context, verify a Bearer token.
   if (!user) {

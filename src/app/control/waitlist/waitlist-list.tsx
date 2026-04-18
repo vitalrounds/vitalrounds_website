@@ -36,33 +36,25 @@ export default function WaitlistList({ initialRows }: { initialRows: Row[] }) {
     setDeletingId(row.id);
     try {
       const supabase = createBrowserSupabaseClient();
-      const callDelete = async () => {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        let token = session?.access_token;
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-        if (!token) {
-          const refreshed = await supabase.auth.refreshSession();
-          token = refreshed.data.session?.access_token;
-        }
-
-        return fetch(`/api/control/waitlist/${row.id}`, {
-          method: "DELETE",
-          credentials: "include",
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        });
-      };
-
-      let res = await callDelete();
-      if (res.status === 401) {
-        await supabase.auth.refreshSession();
-        res = await callDelete();
-      }
+      const res = await fetch(`/api/control/waitlist/${row.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
 
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(body?.error || `Could not delete application (status ${res.status}).`);
+        throw new Error(
+          body?.error ||
+            (res.status === 401
+              ? "Session expired. Please refresh the page and sign in again."
+              : `Could not delete application (status ${res.status}).`)
+        );
       }
       setRows((prev) => prev.filter((r) => r.id !== row.id));
       router.refresh();
