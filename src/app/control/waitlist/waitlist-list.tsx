@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { deleteWaitlistSubmission } from "./actions";
 
 type Row = {
   id: string;
@@ -35,26 +35,9 @@ export default function WaitlistList({ initialRows }: { initialRows: Row[] }) {
     setError(null);
     setDeletingId(row.id);
     try {
-      const supabase = createBrowserSupabaseClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      const res = await fetch(`/api/control/waitlist/${row.id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
-
-      if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(
-          body?.error ||
-            (res.status === 401
-              ? "Session expired. Please refresh the page and sign in again."
-              : `Could not delete application (status ${res.status}).`)
-        );
+      const result = await deleteWaitlistSubmission(row.id);
+      if (!result.ok) {
+        throw new Error(result.error);
       }
       setRows((prev) => prev.filter((r) => r.id !== row.id));
       router.refresh();

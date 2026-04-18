@@ -1,18 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseCookieOptions } from "@/lib/supabase/cookie-options";
-
-function isEmailAllowedAdmin(email: string | undefined): boolean {
-  if (!email) return false;
-  const raw = process.env.ADMIN_EMAILS ?? "";
-  if (!raw.trim()) return true;
-  const allowed = raw
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  return allowed.includes(email.toLowerCase());
-}
 
 const supabaseProjectId =
   process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID ??
@@ -55,28 +43,19 @@ function mergeResponseMeta(from: NextResponse, to: NextResponse) {
   copyAuthHeaders(from, to);
 }
 
-/**
- * Resolve the signed-in user for route gates.
- *
- * Important: `getUser()` can return `{ user: null, error: null }` during refresh
- * edge cases; we must fall back to `getSession().user` or client navigations can
- * look "logged out" and middleware will redirect to `/login`.
- */
-async function getUserForGate(supabase: SupabaseClient) {
-  await supabase.auth.getSession();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return user ?? session?.user ?? null;
-}
-
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   if (!supabaseAnonKey) {
+    return supabaseResponse;
+  }
+
+  const host = getHost(request);
+  const pathname = request.nextUrl.pathname;
+  const onControlHost = isControlHost(host);
+
+  // Avoid unnecessary auth refresh churn on API routes.
+  if (pathname.startsWith("/api/")) {
     return supabaseResponse;
   }
 
@@ -105,11 +84,10 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const user = await getUserForGate(supabase);
-
-  const host = getHost(request);
-  const pathname = request.nextUrl.pathname;
-  const onControlHost = isControlHost(host);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const redirectWithSession = (url: URL) => {
     const redirectResponse = NextResponse.redirect(url);
@@ -126,6 +104,7 @@ export async function updateSession(request: NextRequest) {
   if (
     onControlHost &&
     !pathname.startsWith("/control") &&
+    !pathname.startsWith("/api") &&
     !pathname.startsWith("/login") &&
     !pathname.startsWith("/auth")
   ) {
