@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 /**
- * Accepts wait list payload (survey + identity + optional files). Extend later with DB / email.
+ * Accepts wait list payload (survey + identity + optional files). Persists JSON to Supabase when configured.
  */
 export async function POST(req: Request) {
   try {
@@ -37,6 +38,36 @@ export async function POST(req: Request) {
         files: fileNames,
         at: new Date().toISOString(),
       });
+
+      try {
+        const admin = createServiceRoleClient();
+        const details = (parsed as { details?: { email?: string } }).details;
+        const applicantEmail =
+          typeof details?.email === "string" ? details.email.trim() : null;
+
+        const { error: insertError } = await admin.from("waitlist_submissions").insert({
+          applicant_email: applicantEmail,
+          payload: parsed as object,
+          file_names: fileNames,
+        });
+
+        if (insertError) {
+          console.error("[waitlist] supabase insert", insertError);
+          return NextResponse.json(
+            { error: "Could not save submission. Try again later." },
+            { status: 503 }
+          );
+        }
+      } catch (e) {
+        console.error("[waitlist] persistence", e);
+        return NextResponse.json(
+          {
+            error:
+              "Server is not configured to save submissions (missing SUPABASE_SERVICE_ROLE_KEY or database table).",
+          },
+          { status: 503 }
+        );
+      }
 
       return NextResponse.json({ ok: true });
     }

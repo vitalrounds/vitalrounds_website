@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export default async function ControlHomePage() {
@@ -23,7 +24,15 @@ export default async function ControlHomePage() {
         <section className="rounded-2xl border border-[#354a38] bg-[#2c3d2f] p-6">
           <h2 className="text-lg font-semibold text-white">Quick links</h2>
           <ul className="mt-3 space-y-2 text-sm text-[#a6ccac]">
-            <li>— Application review (coming soon)</li>
+            <li>
+              —{" "}
+              <Link
+                href="/control/waitlist"
+                className="font-medium text-[#cbecd0] underline-offset-2 hover:text-white hover:underline"
+              >
+                Wait list applications
+              </Link>
+            </li>
             <li>— Hospital accounts (coming soon)</li>
             <li>— Platform settings (coming soon)</li>
           </ul>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ControlSidebar } from "./control-sidebar";
 
 export default function ControlLayout({
   children,
@@ -6,20 +7,21 @@ export default function ControlLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#1a241c] text-[#cbecd0]">
+    <div className="flex min-h-screen flex-col bg-[#1a241c] text-[#cbecd0]">
       <header className="border-b border-[#354a38] bg-[#2c3d2f]">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="flex items-center justify-between px-6 py-4">
           <Link href="/control" className="text-sm font-semibold tracking-wide">
             VitalRounds Control
           </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/auth/sign-out" className="text-[#a6ccac] hover:text-white">
-              Sign out
-            </Link>
-          </nav>
+          <Link href="/auth/sign-out" className="text-sm text-[#a6ccac] hover:text-white">
+            Sign out
+          </Link>
         </div>
       </header>
-      <div className="mx-auto max-w-6xl px-6 py-10">{children}</div>
+      <div className="flex min-h-0 flex-1">
+        <ControlSidebar />
+        <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+      </div>
     </div>
   );
 }
