@@ -77,14 +77,21 @@ const journeySteps = [
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-clip bg-[#f5fbf6] text-[#2c3d2f]">
-      <section className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7 md:px-10">
+      <section className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-7 md:px-10">
         <Link href="/" className="inline-flex items-center gap-3">
-          <Image src="/logo.png" alt="VitalRounds logo" width={240} height={54} priority />
+          <Image
+            src="/logo.png"
+            alt="VitalRounds logo"
+            width={240}
+            height={54}
+            priority
+            className="h-auto w-[150px] sm:w-[210px] md:w-[240px]"
+          />
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/login"
-            className="rounded-full border border-[#759d7b] px-5 py-2 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0]"
+            className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full border border-[#759d7b] px-4 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] sm:px-5"
           >
             Login
           </Link>
@@ -96,7 +103,7 @@ export default function Home() {
           </a>
           <Link
             href="/waitlist"
-            className="rounded-full bg-[#759d7b] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#5f7362]"
+            className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-[#759d7b] px-4 text-sm font-semibold text-white transition hover:bg-[#5f7362] sm:px-5"
           >
             Join the wait list
           </Link>
