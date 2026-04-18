@@ -1,8 +1,71 @@
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
+const WAITLIST_BUCKET = process.env.WAITLIST_STORAGE_BUCKET ?? "waitlist-documents";
+
+type UploadInfo = {
+  key: string;
+  name: string;
+  path: string;
+  size: number;
+  type: string | null;
+  bucket: string;
+};
+
+const FILE_FIELDS = [
+  "cv",
+  "passport",
+  "degreeCertificate",
+  "amcPart1",
+  "englishTestReport",
+  "internshipCertificate",
+  "visa",
+] as const;
+
+function sanitizeFileName(name: string): string {
+  return name
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "")
+    .replace(/-+/g, "-")
+    .toLowerCase();
+}
+
+async function uploadFiles(admin: ReturnType<typeof createServiceRoleClient>, form: FormData, submissionId: string) {
+  const uploaded: UploadInfo[] = [];
+  for (const key of FILE_FIELDS) {
+    const entry = form.get(key);
+    if (!(entry instanceof File)) continue;
+
+    const safeName = sanitizeFileName(entry.name || `${key}.bin`);
+    const objectPath = `waitlist/${submissionId}/${key}-${safeName}`;
+    const fileBytes = new Uint8Array(await entry.arrayBuffer());
+
+    const { error: uploadError } = await admin.storage
+      .from(WAITLIST_BUCKET)
+      .upload(objectPath, fileBytes, {
+        contentType: entry.type || undefined,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw new Error(`upload_failed:${key}:${uploadError.message}`);
+    }
+
+    uploaded.push({
+      key,
+      name: entry.name,
+      path: objectPath,
+      size: entry.size,
+      type: entry.type || null,
+      bucket: WAITLIST_BUCKET,
+    });
+  }
+  return uploaded;
+}
+
 /**
- * Accepts wait list payload (survey + identity + optional files). Persists JSON to Supabase when configured.
+ * Accepts wait list payload (survey + identity + files).
+ * Persists JSON to Supabase and uploads files to private Storage bucket.
  */
 export async function POST(req: Request) {
   try {
@@ -41,14 +104,19 @@ export async function POST(req: Request) {
 
       try {
         const admin = createServiceRoleClient();
+        const submissionId = crypto.randomUUID();
+        const uploaded = await uploadFiles(admin, form, submissionId);
+        const filesObject = Object.fromEntries(uploaded.map((f) => [f.key, f]));
         const details = (parsed as { details?: { email?: string } }).details;
         const applicantEmail =
           typeof details?.email === "string" ? details.email.trim() : null;
 
         const { error: insertError } = await admin.from("waitlist_submissions").insert({
+          id: submissionId,
           applicant_email: applicantEmail,
           payload: parsed as object,
           file_names: fileNames,
+          files: filesObject,
         });
 
         if (insertError) {
@@ -63,7 +131,7 @@ export async function POST(req: Request) {
         return NextResponse.json(
           {
             error:
-              "Server is not configured to save submissions (missing SUPABASE_SERVICE_ROLE_KEY or database table).",
+              "Server is not configured to save submissions (missing SUPABASE_SERVICE_ROLE_KEY, storage bucket, or database table).",
           },
           { status: 503 }
         );
