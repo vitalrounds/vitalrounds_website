@@ -20,16 +20,16 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid json" }, { status: 400 });
       }
 
+      const pickName = (key: string) =>
+        form.get(key) instanceof File ? (form.get(key) as File).name : null;
       const fileNames = {
-        cv: form.get("cv") instanceof File ? (form.get("cv") as File).name : null,
-        degreeCertificate:
-          form.get("degreeCertificate") instanceof File
-            ? (form.get("degreeCertificate") as File).name
-            : null,
-        otherDocument:
-          form.get("otherDocument") instanceof File
-            ? (form.get("otherDocument") as File).name
-            : null,
+        cv: pickName("cv"),
+        passport: pickName("passport"),
+        degreeCertificate: pickName("degreeCertificate"),
+        amcPart1: pickName("amcPart1"),
+        englishTestReport: pickName("englishTestReport"),
+        internshipCertificate: pickName("internshipCertificate"),
+        visa: pickName("visa"),
       };
 
       console.info("[waitlist] multipart submission", {

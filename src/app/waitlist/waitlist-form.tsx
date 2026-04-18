@@ -12,6 +12,13 @@ import {
 
 const ENGLISH_TESTS = ["OET", "IELTS", "PTE"] as const;
 const VISA_OPTIONS = ["Student", "Tourist", "PR", "Citizen", "Other"] as const;
+const MAX_UPLOAD_MB = 5;
+
+function wordCount(s: string): number {
+  const t = s.trim();
+  if (!t) return 0;
+  return t.split(/\s+/).length;
+}
 
 type Details = {
   fullLegalName: string;
@@ -33,6 +40,8 @@ type Details = {
   preferredSpecialties: string[];
   preferredStart: string;
   additionalNotes: string;
+  /** Optional; max 500 words */
+  personalStatement: string;
 };
 
 const emptyDetails = (): Details => ({
@@ -55,15 +64,20 @@ const emptyDetails = (): Details => ({
   preferredSpecialties: [],
   preferredStart: "",
   additionalNotes: "",
+  personalStatement: "",
 });
 
 export default function WaitlistForm() {
   const [step, setStep] = useState(0);
   const [survey, setSurvey] = useState<Record<string, string | string[]>>({});
   const [details, setDetails] = useState<Details>(() => emptyDetails());
-  const [cv, setCv] = useState<File | null>(null);
-  const [degreeCert, setDegreeCert] = useState<File | null>(null);
-  const [otherDoc, setOtherDoc] = useState<File | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [passportFile, setPassportFile] = useState<File | null>(null);
+  const [degreeCertFile, setDegreeCertFile] = useState<File | null>(null);
+  const [amcPart1File, setAmcPart1File] = useState<File | null>(null);
+  const [englishTestReportFile, setEnglishTestReportFile] = useState<File | null>(null);
+  const [internshipCertFile, setInternshipCertFile] = useState<File | null>(null);
+  const [visaFile, setVisaFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -124,6 +138,40 @@ export default function WaitlistForm() {
     if (!details.preferredStart) return "Preferred start date is required.";
     if (details.additionalNotes.length > 300)
       return "Additional notes must be 300 characters or less.";
+    if (wordCount(details.personalStatement) > 500)
+      return "Personal statement must be 500 words or less.";
+    return null;
+  };
+
+  const validateRegistrationUploads = (): string | null => {
+    if (!cvFile) return "Please upload your curriculum vitae (CV).";
+    if (!passportFile) return "Please upload your passport (photo page).";
+    if (!degreeCertFile) return "Please upload your medical degree certificate.";
+    const check = (f: File | null, label: string) =>
+      f && f.size > MAX_UPLOAD_MB * 1024 * 1024 ? `${label} must be ${MAX_UPLOAD_MB}MB or smaller.` : null;
+    const errs = [
+      check(cvFile, "CV"),
+      check(passportFile, "Passport"),
+      check(degreeCertFile, "Medical degree certificate"),
+      check(amcPart1File, "AMC Part 1 document"),
+      check(englishTestReportFile, "English test report"),
+      check(internshipCertFile, "Internship certificate"),
+      check(visaFile, "Visa document"),
+    ].filter(Boolean) as string[];
+    if (errs.length) return errs[0];
+    const cvName = cvFile.name.toLowerCase();
+    if (!cvName.endsWith(".pdf"))
+      return "CV must be a PDF file.";
+    const passName = passportFile.name.toLowerCase();
+    if (
+      !passName.endsWith(".pdf") &&
+      !passName.endsWith(".jpg") &&
+      !passName.endsWith(".jpeg")
+    )
+      return "Passport upload must be PDF or JPG.";
+    const degName = degreeCertFile.name.toLowerCase();
+    if (!degName.endsWith(".pdf"))
+      return "Medical degree certificate must be a PDF.";
     return null;
   };
 
@@ -161,6 +209,11 @@ export default function WaitlistForm() {
       setError(v);
       return;
     }
+    const vu = validateRegistrationUploads();
+    if (vu) {
+      setError(vu);
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -172,13 +225,18 @@ export default function WaitlistForm() {
           details: {
             ...details,
             additionalNotes: details.additionalNotes.trim(),
+            personalStatement: details.personalStatement.trim(),
           },
           submittedAt: new Date().toISOString(),
         })
       );
-      if (cv) fd.append("cv", cv);
-      if (degreeCert) fd.append("degreeCertificate", degreeCert);
-      if (otherDoc) fd.append("otherDocument", otherDoc);
+      fd.append("cv", cvFile as File);
+      fd.append("passport", passportFile as File);
+      fd.append("degreeCertificate", degreeCertFile as File);
+      if (amcPart1File) fd.append("amcPart1", amcPart1File);
+      if (englishTestReportFile) fd.append("englishTestReport", englishTestReportFile);
+      if (internshipCertFile) fd.append("internshipCertificate", internshipCertFile);
+      if (visaFile) fd.append("visa", visaFile);
 
       const res = await fetch("/api/waitlist", { method: "POST", body: fd });
       if (!res.ok) throw new Error("Request failed");
@@ -465,6 +523,7 @@ export default function WaitlistForm() {
                 <p className="mb-2 text-sm font-medium text-[#2c3d2f]">
                   Preferred specialty / department <span className="text-red-600">*</span>
                 </p>
+                <p className="mb-3 text-xs text-[#6e706e]">Multi-select — from survey</p>
                 <div className="flex flex-wrap gap-2">
                   {SPECIALTY_OPTIONS.map((opt) => {
                     const selected = details.preferredSpecialties.includes(opt);
@@ -488,7 +547,7 @@ export default function WaitlistForm() {
               <Field
                 label="Preferred start date"
                 required
-                hint="month or specific date"
+                hint="Date picker or month selector"
                 type="month"
                 value={details.preferredStart}
                 onChange={(v) => setDetail("preferredStart", v)}
@@ -512,15 +571,116 @@ export default function WaitlistForm() {
 
             <section className="space-y-4">
               <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[#6e706e]">
-                Documents
+                Required at registration
               </h2>
-              <p className="text-sm text-[#6e706e]">
-                Upload PDF or images. You can add more requirements later — we&apos;ll store these
-                once backend storage is connected.
-              </p>
-              <FileRow label="CV / resume" file={cv} onChange={setCv} />
-              <FileRow label="Medical degree certificate" file={degreeCert} onChange={setDegreeCert} />
-              <FileRow label="Other supporting document" file={otherDoc} onChange={setOtherDoc} />
+              <DocumentUploadCard
+                abbr="CV"
+                abbrClassName="bg-sky-100 text-sky-900"
+                title="Curriculum vitae (CV)"
+                description="Medical CV including education, clinical experience, and any research or publications. PDF only, max 5MB."
+                status="required"
+                accept=".pdf,application/pdf"
+                file={cvFile}
+                onChange={setCvFile}
+              />
+              <DocumentUploadCard
+                abbr="ID"
+                abbrClassName="bg-violet-100 text-violet-900"
+                title="Passport (photo page)"
+                description="Clear scan or photo of the identity page. Used for identity verification only. PDF or JPG, max 5MB."
+                status="required"
+                accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg"
+                file={passportFile}
+                onChange={setPassportFile}
+              />
+              <DocumentUploadCard
+                abbr="MB"
+                abbrClassName="bg-emerald-100 text-emerald-900"
+                title="Medical degree certificate"
+                description="Official copy of your primary medical qualification (MBBS, MBChB, MD etc.). PDF only, max 5MB."
+                status="required"
+                accept=".pdf,application/pdf"
+                file={degreeCertFile}
+                onChange={setDegreeCertFile}
+              />
+            </section>
+
+            <section className="space-y-4 pt-2">
+              <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[#6e706e]">
+                Upload if available
+              </h2>
+              <DocumentUploadCard
+                abbr="AM"
+                abbrClassName="bg-teal-100 text-teal-900"
+                title="AMC Part 1 result letter"
+                description="Official result letter or certificate from the Australian Medical Council."
+                status="applicable"
+                accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg"
+                file={amcPart1File}
+                onChange={setAmcPart1File}
+              />
+              <DocumentUploadCard
+                abbr="EN"
+                abbrClassName="bg-orange-100 text-orange-900"
+                title="English language test result"
+                description="OET, IELTS Academic, or PTE Academic score report. Must be within validity period."
+                status="applicable"
+                accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg"
+                file={englishTestReportFile}
+                onChange={setEnglishTestReportFile}
+              />
+              <div className="rounded-2xl border border-[#e8ebe8] bg-[#faf8f5] p-4">
+                <div className="flex gap-4">
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-900"
+                    aria-hidden
+                  >
+                    PS
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <p className="font-semibold text-[#2c3d2f]">Personal statement</p>
+                      <span className="shrink-0 rounded-full bg-[#eef1ee] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#5f7362]">
+                        Strongly encouraged
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs leading-relaxed text-[#6e706e]">
+                      A brief statement (max 500 words) on your goals and what you hope to gain from the
+                      observership. Helps with hospital matching.
+                    </p>
+                    <textarea
+                      rows={6}
+                      value={details.personalStatement}
+                      onChange={(e) => setDetail("personalStatement", e.target.value)}
+                      placeholder="Write here…"
+                      className="mt-3 w-full rounded-xl border border-[#d5dfd6] bg-white px-3 py-2 text-sm text-[#2c3d2f] outline-none ring-[#759d7b]/30 placeholder:text-neutral-400 focus:ring-2"
+                    />
+                    <p className="mt-2 text-xs text-[#6e706e]">
+                      {wordCount(details.personalStatement)} / 500 words
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <DocumentUploadCard
+                abbr="IN"
+                abbrClassName="bg-zinc-200 text-zinc-800"
+                title="Internship / training completion certificate"
+                description="Evidence of post-graduate clinical training from your home country."
+                status="applicable"
+                accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg"
+                file={internshipCertFile}
+                onChange={setInternshipCertFile}
+              />
+              <DocumentUploadCard
+                abbr="VI"
+                abbrClassName="bg-stone-200 text-stone-800"
+                title="Australian visa (if already in Australia)"
+                description="Copy of your current visa grant notice or ImmiAccount status."
+                status="applicable"
+                accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg"
+                file={visaFile}
+                onChange={setVisaFile}
+              />
             </section>
 
             {error && (
@@ -569,7 +729,7 @@ function Field({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e8ebe8] bg-[#fafcf9] p-4">
+    <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
       <label className="text-sm font-semibold text-[#2c3d2f]">
         {label}{" "}
         {required && <span className="text-red-600">*</span>}
@@ -601,7 +761,7 @@ function SelectField({
   placeholderOption?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e8ebe8] bg-[#fafcf9] p-4">
+    <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
       <label className="text-sm font-semibold text-[#2c3d2f]">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
@@ -623,29 +783,61 @@ function SelectField({
   );
 }
 
-function FileRow({
-  label,
+function DocumentUploadCard({
+  abbr,
+  abbrClassName,
+  title,
+  description,
+  status,
+  accept,
   file,
   onChange,
 }: {
-  label: string;
+  abbr: string;
+  abbrClassName: string;
+  title: string;
+  description: string;
+  status: "required" | "applicable";
+  accept: string;
   file: File | null;
   onChange: (f: File | null) => void;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e8ebe8] bg-[#fafcf9] p-4">
-      <p className="text-sm font-semibold text-[#2c3d2f]">{label}</p>
-      <input
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png,.webp"
-        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
-        className="mt-2 block w-full text-sm text-[#354a38] file:mr-3 file:rounded-lg file:border-0 file:bg-[#cbecd0] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[#354a38]"
-      />
-      {file && (
-        <p className="mt-2 text-xs text-[#6e706e]">
-          Selected: {file.name} ({Math.round(file.size / 1024)} KB)
-        </p>
-      )}
+    <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
+      <div className="flex gap-4">
+        <div
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xs font-bold ${abbrClassName}`}
+          aria-hidden
+        >
+          {abbr}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <p className="font-semibold text-[#2c3d2f]">{title}</p>
+            {status === "required" ? (
+              <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-800">
+                Required
+              </span>
+            ) : (
+              <span className="shrink-0 rounded-full bg-[#eef1ee] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#5f7362]">
+                If applicable
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-[#6e706e]">{description}</p>
+          <input
+            type="file"
+            accept={accept}
+            onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+            className="mt-3 block w-full text-sm text-[#354a38] file:mr-3 file:rounded-lg file:border-0 file:bg-[#cbecd0] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[#354a38]"
+          />
+          {file && (
+            <p className="mt-2 text-xs text-[#6e706e]">
+              Selected: {file.name} ({Math.round(file.size / 1024)} KB)
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
