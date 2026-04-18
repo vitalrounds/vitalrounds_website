@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
-import {
-  getRoleFromUser,
-  isEmailAllowedAdmin,
-} from "@/lib/auth/redirect-after-login";
+import { requireAdminForApi } from "@/lib/auth/require-admin-api";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 const WAITLIST_BUCKET = process.env.WAITLIST_STORAGE_BUCKET ?? "waitlist-documents";
@@ -13,29 +9,11 @@ type StoredFile = {
   bucket?: string;
 };
 
-async function requireAdminForApi() {
-  const auth = await createServerSupabaseClient();
-  await auth.auth.getSession();
-  const {
-    data: { user: verifiedUser },
-  } = await auth.auth.getUser();
-  const {
-    data: { session },
-  } = await auth.auth.getSession();
-  const user = verifiedUser ?? session?.user ?? null;
-  if (!user) return { ok: false as const, status: 401 };
-  const role = getRoleFromUser(user);
-  if (role !== "admin" || !isEmailAllowedAdmin(user.email ?? undefined)) {
-    return { ok: false as const, status: 403 };
-  }
-  return { ok: true as const };
-}
-
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const adminCheck = await requireAdminForApi();
+  const adminCheck = await requireAdminForApi(req);
   if (!adminCheck.ok) {
     return NextResponse.json({ error: "Unauthorized" }, { status: adminCheck.status });
   }

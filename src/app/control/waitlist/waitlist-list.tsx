@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type Row = {
   id: string;
@@ -34,7 +35,17 @@ export default function WaitlistList({ initialRows }: { initialRows: Row[] }) {
     setError(null);
     setDeletingId(row.id);
     try {
-      const res = await fetch(`/api/control/waitlist/${row.id}`, { method: "DELETE" });
+      const supabase = createBrowserSupabaseClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      const res = await fetch(`/api/control/waitlist/${row.id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(body?.error || "Could not delete application.");
