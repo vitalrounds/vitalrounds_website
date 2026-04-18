@@ -76,7 +76,13 @@ const journeySteps = [
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-x-clip bg-[#f5fbf6] text-[#2c3d2f]">
+    <main
+      className="min-h-screen overflow-x-clip text-[#2c3d2f]"
+      style={{
+        background:
+          "linear-gradient(105deg, #f5fbf6 0%, #f5fbf6 34%, #ecf4ed 52%, #dfece2 72%, #d4e4d6 100%)",
+      }}
+    >
       <section className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-7 md:px-10">
         <Link href="/" className="inline-flex items-center gap-3">
           <Image
@@ -110,20 +116,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        className="relative mx-auto max-w-7xl px-6 pb-24 pt-8 md:px-10"
-        style={{
-          /* Inline so this always ships; a blur layer under the poster was invisible behind opaque pixels. */
-          background:
-            "linear-gradient(105deg, #f5fbf6 0%, #f5fbf6 34%, #ecf4ed 52%, #dfece2 72%, #d4e4d6 100%)",
-        }}
-      >
-        <div className="relative grid items-start gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
+      <section className="relative px-6 pb-24 pt-8 md:px-10">
+        <div className="relative mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
           <RevealOnScroll className="min-w-0 space-y-5 overflow-x-clip lg:col-span-5">
             <p className="inline-flex rounded-full bg-[#cbecd0] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#354a38]">
               Purpose-built for IMG clinical exposure
             </p>
-            <h1 className="text-4xl font-semibold leading-tight text-[#2c3d2f] md:text-5xl xl:text-[3.25rem] xl:leading-[1.12]">
+            <h1 className="max-w-[18ch] text-balance text-4xl font-semibold leading-[1.08] text-[#2c3d2f] md:text-5xl xl:text-[3.35rem]">
               Build clinical confidence in Australia through guided observerships.
             </h1>
             <p className="rounded-2xl border border-[#a6ccac] bg-white px-4 py-3 text-sm font-semibold leading-7 text-[#354a38]">
@@ -150,29 +149,20 @@ export default function Home() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll
-            delayMs={150}
-            className="relative z-10 min-w-0 lg:col-span-7"
-          >
-            {/* Sage wash only — no white mat, no inset highlights, image flush to inner crop */}
+          <RevealOnScroll delayMs={150} className="relative z-10 min-w-0 lg:col-span-7">
             <div
-              className="rounded-2xl bg-gradient-to-br from-[#8aab8f] via-[#759d7b] to-[#628568] p-3 sm:rounded-3xl sm:p-4 md:p-5"
-              style={{
-                boxShadow:
-                  "0 24px 56px -20px rgba(44, 61, 47, 0.35), 0 0 0 1px rgba(53, 74, 56, 0.12)",
-              }}
+              className="overflow-hidden rounded-2xl sm:rounded-3xl"
+              style={{ boxShadow: "0 24px 56px -20px rgba(44, 61, 47, 0.35)" }}
             >
-              <div className="overflow-hidden rounded-xl bg-[#759d7b] sm:rounded-2xl">
-                <Image
-                  src="/clinical-network-poster.png"
-                  alt="VitalRounds: A New Era in Medical Rounds"
-                  width={1024}
-                  height={524}
-                  className="block h-auto w-full align-middle"
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                  priority
-                />
-              </div>
+              <Image
+                src="/clinical-network-poster.png"
+                alt="VitalRounds: A New Era in Medical Rounds"
+                width={1200}
+                height={616}
+                className="block h-auto w-full align-middle"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                priority
+              />
             </div>
           </RevealOnScroll>
         </div>
