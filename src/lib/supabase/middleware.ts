@@ -55,18 +55,22 @@ function mergeResponseMeta(from: NextResponse, to: NextResponse) {
   copyAuthHeaders(from, to);
 }
 
+/**
+ * Resolve the signed-in user for route gates.
+ *
+ * Important: `getUser()` can return `{ user: null, error: null }` during refresh
+ * edge cases; we must fall back to `getSession().user` or client navigations can
+ * look "logged out" and middleware will redirect to `/login`.
+ */
 async function getUserForGate(supabase: SupabaseClient) {
   await supabase.auth.getSession();
   const {
     data: { user },
-    error,
   } = await supabase.auth.getUser();
-  if (user) return user;
-  if (!error) return null;
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  return session?.user ?? null;
+  return user ?? session?.user ?? null;
 }
 
 export async function updateSession(request: NextRequest) {
