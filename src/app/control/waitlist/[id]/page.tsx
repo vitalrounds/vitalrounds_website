@@ -49,9 +49,13 @@ export default async function ControlWaitlistSubmissionPage({
   }
 
   const row = data as Row;
-  const payloadDetails = (row.payload?.details ?? {}) as Record<string, unknown>;
+  const payload = (row.payload ?? {}) as Record<string, unknown>;
+  const payloadDetails = (payload.details ?? {}) as Record<string, unknown>;
+  const payloadSurvey = (payload.survey ?? {}) as Record<string, unknown>;
   const files = row.files ?? {};
   const fileEntries = Object.entries(files);
+  const detailsEntries = Object.entries(payloadDetails);
+  const surveyEntries = Object.entries(payloadSurvey);
 
   return (
     <div className="space-y-8">
@@ -76,6 +80,12 @@ export default async function ControlWaitlistSubmissionPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-sm text-[#a6ccac]">{row.applicant_email ?? "No email provided"}</p>
+            <p className="mt-1 text-xs text-[#a6ccac]/80">
+              Submitted at:{" "}
+              {typeof payload.submittedAt === "string"
+                ? payload.submittedAt
+                : "Not provided"}
+            </p>
           </div>
           <div className="text-right text-xs text-[#a6ccac]">
             <p>
@@ -99,6 +109,54 @@ export default async function ControlWaitlistSubmissionPage({
           <Info label="AMC candidate number" value={stringOrDash(payloadDetails.amcCandidateNumber)} />
           <Info label="Visa status" value={stringOrDash(payloadDetails.visaStatus)} />
         </dl>
+
+        <section className="mt-6">
+          <h3 className="text-sm font-semibold text-white">All details fields</h3>
+          {detailsEntries.length > 0 ? (
+            <div className="mt-3 overflow-hidden rounded-xl border border-[#445a47]">
+              <table className="min-w-full text-left text-sm">
+                <tbody>
+                  {detailsEntries.map(([key, value]) => (
+                    <tr key={key} className="border-b border-[#445a47] last:border-b-0">
+                      <th className="w-1/3 bg-[#243329] px-3 py-2 text-xs uppercase tracking-wider text-[#a6ccac]">
+                        {humanizeKey(key)}
+                      </th>
+                      <td className="bg-[#1f2d24] px-3 py-2 text-[#cbecd0]">
+                        {renderValue(value)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-[#a6ccac]">No details fields found.</p>
+          )}
+        </section>
+
+        <section className="mt-6">
+          <h3 className="text-sm font-semibold text-white">All survey answers</h3>
+          {surveyEntries.length > 0 ? (
+            <div className="mt-3 overflow-hidden rounded-xl border border-[#445a47]">
+              <table className="min-w-full text-left text-sm">
+                <tbody>
+                  {surveyEntries.map(([key, value]) => (
+                    <tr key={key} className="border-b border-[#445a47] last:border-b-0">
+                      <th className="w-1/3 bg-[#243329] px-3 py-2 text-xs uppercase tracking-wider text-[#a6ccac]">
+                        {humanizeKey(key)}
+                      </th>
+                      <td className="bg-[#1f2d24] px-3 py-2 text-[#cbecd0]">
+                        {renderValue(value)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-[#a6ccac]">No survey answers found.</p>
+          )}
+        </section>
 
         <section className="mt-5">
           <h3 className="text-sm font-semibold text-white">Documents</h3>
@@ -146,9 +204,24 @@ function stringOrDash(value: unknown) {
   return "—";
 }
 
+function humanizeKey(value: string) {
+  return value
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[_-]/g, " ")
+    .trim();
+}
+
 function arrayOrDash(value: unknown) {
   if (Array.isArray(value) && value.length > 0) return value.join(", ");
   return "—";
+}
+
+function renderValue(value: unknown) {
+  if (value === null || value === undefined) return "—";
+  if (Array.isArray(value)) return value.length > 0 ? value.join(", ") : "—";
+  if (typeof value === "object") return JSON.stringify(value);
+  const asString = String(value).trim();
+  return asString || "—";
 }
 
 function Info({ label, value }: { label: string; value: string }) {
