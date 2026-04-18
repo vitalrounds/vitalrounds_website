@@ -47,21 +47,55 @@ function buildAppOrigin(req: Request) {
   return new URL(req.url).origin;
 }
 
-async function sendWaitlistConfirmationEmail(opts: {
-  to: string;
-  name: string | null;
-}) {
+function getResendConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.WAITLIST_FROM_EMAIL?.trim();
-  if (!apiKey || !from) {
+  const replyTo = process.env.WAITLIST_REPLY_TO?.trim() || undefined;
+  if (!apiKey || !from) return null;
+  return { apiKey, from, replyTo };
+}
+
+async function sendResendEmail(opts: {
+  to: string[];
+  subject: string;
+  html: string;
+  text: string;
+}) {
+  const cfg = getResendConfig();
+  if (!cfg) {
     console.warn(
-      "[waitlist] confirmation email skipped: missing RESEND_API_KEY or WAITLIST_FROM_EMAIL"
+      "[waitlist] email skipped: missing RESEND_API_KEY or WAITLIST_FROM_EMAIL"
     );
     return;
   }
 
+  const res = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${cfg.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: cfg.from,
+      to: opts.to,
+      reply_to: cfg.replyTo ? [cfg.replyTo] : undefined,
+      subject: opts.subject,
+      html: opts.html,
+      text: opts.text,
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`resend_failed:${res.status}:${body}`);
+  }
+}
+
+async function sendWaitlistConfirmationEmail(opts: {
+  to: string;
+  name: string | null;
+}) {
   const name = opts.name ?? "there";
-  const replyTo = process.env.WAITLIST_REPLY_TO?.trim() || undefined;
 
   const html = `
     <p>Hi ${name},</p>
@@ -70,26 +104,12 @@ async function sendWaitlistConfirmationEmail(opts: {
     <p>Kind regards,<br/>VitalRounds Team</p>
   `;
 
-  const res = await fetch(RESEND_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [opts.to],
-      reply_to: replyTo ? [replyTo] : undefined,
-      subject: "You have joined the VitalRounds wait list",
-      html,
-      text: `Hi ${name},\n\nThanks for joining the VitalRounds wait list.\nWe have received your details and will contact you once your turn is up.\n\nKind regards,\nVitalRounds Team`,
-    }),
+  await sendResendEmail({
+    to: [opts.to],
+    subject: "You have joined the VitalRounds wait list",
+    html,
+    text: `Hi ${name},\n\nThanks for joining the VitalRounds wait list.\nWe have received your details and will contact you once your turn is up.\n\nKind regards,\nVitalRounds Team`,
   });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`resend_failed:${res.status}:${body}`);
-  }
 }
 
 async function provisionApplicantAccount(opts: {
@@ -123,6 +143,48 @@ async function provisionApplicantAccount(opts: {
   if (reset.error) {
     throw new Error(`password_setup_failed:${reset.error.message}`);
   }
+}
+
+async function sendWaitlistAdminNotification(opts: {
+  req: Request;
+  submissionId: string;
+  applicantEmail: string | null;
+  applicantName: string | null;
+  details: Record<string, unknown> | undefined;
+}) {
+  const rawRecipients =
+    process.env.WAITLIST_ADMIN_NOTIFY_TO?.trim() || "admin@vitalrounds.com.au";
+  const recipients = rawRecipients
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
+  if (recipients.length === 0) return;
+
+  const applicant = opts.applicantName ?? "Unknown applicant";
+  const city =
+    typeof opts.details?.cityCountry === "string" && opts.details.cityCountry.trim()
+      ? opts.details.cityCountry.trim()
+      : "—";
+  const detailUrl = `${buildAppOrigin(opts.req)}/control/waitlist/${opts.submissionId}`;
+  const safeEmail = opts.applicantEmail ?? "—";
+
+  const html = `
+    <p>A new wait list request has been submitted.</p>
+    <ul>
+      <li><strong>Name:</strong> ${applicant}</li>
+      <li><strong>Email:</strong> ${safeEmail}</li>
+      <li><strong>Current city:</strong> ${city}</li>
+      <li><strong>Submission ID:</strong> ${opts.submissionId}</li>
+    </ul>
+    <p><a href="${detailUrl}">Open submission in control panel</a></p>
+  `;
+
+  await sendResendEmail({
+    to: recipients,
+    subject: "New wait list submission received",
+    html,
+    text: `A new wait list request has been submitted.\n\nName: ${applicant}\nEmail: ${safeEmail}\nCurrent city: ${city}\nSubmission ID: ${opts.submissionId}\n\nOpen submission: ${detailUrl}`,
+  });
 }
 
 async function uploadFiles(admin: ReturnType<typeof createServiceRoleClient>, form: FormData, submissionId: string) {
@@ -202,7 +264,7 @@ export async function POST(req: Request) {
         const submissionId = crypto.randomUUID();
         const uploaded = await uploadFiles(admin, form, submissionId);
         const filesObject = Object.fromEntries(uploaded.map((f) => [f.key, f]));
-        const { applicantEmail, applicantName } = getApplicantDetails(parsed);
+        const { details, applicantEmail, applicantName } = getApplicantDetails(parsed);
 
         const { error: insertError } = await admin.from("waitlist_submissions").insert({
           id: submissionId,
@@ -238,6 +300,18 @@ export async function POST(req: Request) {
             // Submission is already persisted; keep success response but log provisioning issues.
             console.error("[waitlist] account/email workflow", notifyError);
           }
+        }
+
+        try {
+          await sendWaitlistAdminNotification({
+            req,
+            submissionId,
+            applicantEmail,
+            applicantName,
+            details,
+          });
+        } catch (notifyAdminError) {
+          console.error("[waitlist] admin notification workflow", notifyAdminError);
         }
       } catch (e) {
         console.error("[waitlist] persistence", e);
