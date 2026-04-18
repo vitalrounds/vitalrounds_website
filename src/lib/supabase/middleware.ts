@@ -39,7 +39,7 @@ export function isControlHost(host: string) {
 
 function copyCookies(from: NextResponse, to: NextResponse) {
   from.cookies.getAll().forEach((c) => {
-    to.cookies.set(c.name, c.value);
+    to.cookies.set(c);
   });
 }
 
@@ -134,27 +134,7 @@ export async function updateSession(request: NextRequest) {
     return redirectWithSession(url);
   }
 
-  if (pathname.startsWith("/control")) {
-    if (!user) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("next", pathname);
-      return redirectWithSession(url);
-    }
-    const role = user.user_metadata?.role as string | undefined;
-    if (role !== "admin") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("error", "admin_only");
-      return redirectWithSession(url);
-    }
-    if (!isEmailAllowedAdmin(user.email)) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("error", "admin_only");
-      return redirectWithSession(url);
-    }
-  }
+  // /control access checks run in the control layout with a server-side guard.
 
   if (pathname.startsWith("/customer")) {
     if (!user) {

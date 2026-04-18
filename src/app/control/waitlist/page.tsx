@@ -1,10 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import {
-  getRoleFromUser,
-  isEmailAllowedAdmin,
-} from "@/lib/auth/redirect-after-login";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 export const dynamic = "force-dynamic";
@@ -22,16 +16,6 @@ type Row = {
 };
 
 export default async function ControlWaitlistPage() {
-  const auth = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await auth.auth.getUser();
-
-  const role = getRoleFromUser(user);
-  if (role !== "admin" || !isEmailAllowedAdmin(user?.email)) {
-    redirect("/login?error=admin_only");
-  }
-
   let rows: Row[] = [];
   let loadError: string | null = null;
 

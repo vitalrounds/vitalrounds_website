@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { ControlSidebar } from "./control-sidebar";
 
-export default function ControlLayout({
+export default async function ControlLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireAdmin("/control");
+
   return (
     <div className="flex min-h-screen flex-col bg-[#1a241c] text-[#cbecd0]">
       <header className="border-b border-[#354a38] bg-[#2c3d2f]">
