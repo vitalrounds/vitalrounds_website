@@ -69,6 +69,10 @@ const emptyDetails = (): Details => ({
 
 export default function WaitlistForm() {
   const [step, setStep] = useState(0);
+  /** Used with CSS so the next/previous question slides in from the correct side */
+  const [slideDir, setSlideDir] = useState<"forward" | "backward">("forward");
+  /** Increment on each survey navigation so we skip animation on first paint (step 0). */
+  const [surveyMotion, setSurveyMotion] = useState(0);
   const [survey, setSurvey] = useState<Record<string, string | string[]>>({});
   const [details, setDetails] = useState<Details>(() => emptyDetails());
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -188,11 +192,15 @@ export default function WaitlistForm() {
   const goNext = () => {
     setError(null);
     if (step < surveySteps - 1) {
+      setSurveyMotion((n) => n + 1);
+      setSlideDir("forward");
       setStep((s) => s + 1);
       return;
     }
     if (step === surveySteps - 1) {
       mergeSpecialtiesFromSurvey();
+      setSurveyMotion((n) => n + 1);
+      setSlideDir("forward");
       setStep(surveySteps);
       return;
     }
@@ -200,7 +208,11 @@ export default function WaitlistForm() {
 
   const goBack = () => {
     setError(null);
-    if (step > 0) setStep((s) => s - 1);
+    if (step > 0) {
+      setSurveyMotion((n) => n + 1);
+      setSlideDir("backward");
+      setStep((s) => s - 1);
+    }
   };
 
   const handleSubmit = async () => {
@@ -282,97 +294,108 @@ export default function WaitlistForm() {
 
       <main className="mx-auto max-w-3xl px-6 pb-24 pt-10">
         {step < surveySteps && currentQuestion && (
-          <>
-            <div className="mb-6 flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold uppercase tracking-[0.08em] text-violet-600">
-                Question {currentQuestion.questionNumber}
-              </span>
-              <span
-                className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white ${
-                  currentQuestion.kind === "multi" ? "bg-[#5f7362]" : "bg-[#354a38]"
-                }`}
-              >
-                {currentQuestion.kind === "multi" ? "Multi choice" : "Single choice"}
-              </span>
-            </div>
-            <p className="text-xl font-semibold leading-snug text-[#2c3d2f] md:text-2xl">
-              {currentQuestion.prompt}
-            </p>
-            {currentQuestion.helper && (
-              <p className="mt-3 text-sm italic text-[#6e706e]">{currentQuestion.helper}</p>
-            )}
+          <div className="overflow-hidden pb-2">
+            <div
+              key={step}
+              className={
+                surveyMotion === 0
+                  ? ""
+                  : slideDir === "forward"
+                    ? "waitlist-q-enter-forward"
+                    : "waitlist-q-enter-back"
+              }
+            >
+              <div className="mb-6 flex flex-wrap items-center gap-2">
+                <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[#759d7b]">
+                  Question {currentQuestion.questionNumber}
+                </span>
+                <span
+                  className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white ${
+                    currentQuestion.kind === "multi" ? "bg-[#5f7362]" : "bg-[#354a38]"
+                  }`}
+                >
+                  {currentQuestion.kind === "multi" ? "Multi choice" : "Single choice"}
+                </span>
+              </div>
+              <p className="text-xl font-semibold leading-snug text-[#354a38] md:text-2xl">
+                {currentQuestion.prompt}
+              </p>
+              {currentQuestion.helper && (
+                <p className="mt-3 text-sm italic text-[#6e706e]">{currentQuestion.helper}</p>
+              )}
 
-            <div className="mt-8 flex flex-wrap gap-2">
-              {currentQuestion.kind === "single" &&
-                currentQuestion.options.map((opt) => {
-                  const selected = survey[currentQuestion.id] === opt;
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() =>
-                        setSurvey((s) => ({ ...s, [currentQuestion.id]: opt }))
-                      }
-                      className={`rounded-full border px-4 py-2.5 text-left text-sm transition ${
-                        selected
-                          ? "border-[#759d7b] bg-[#cbecd0] text-[#2c3d2f]"
-                          : "border-neutral-300 bg-[#faf9f6] text-[#354a38] hover:border-[#a6ccac]"
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
-              {currentQuestion.kind === "multi" &&
-                currentQuestion.options.map((opt) => {
-                  const sel = survey[currentQuestion.id];
-                  const arr = Array.isArray(sel) ? sel : [];
-                  const selected = arr.includes(opt);
-                  const maxed =
-                    !!currentQuestion.maxSelections &&
-                    arr.length >= currentQuestion.maxSelections &&
-                    !selected;
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      disabled={maxed}
-                      onClick={() => toggleSurveyMulti(currentQuestion, opt)}
-                      className={`rounded-full border px-4 py-2.5 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${
-                        selected
-                          ? "border-[#759d7b] bg-[#cbecd0] text-[#2c3d2f]"
-                          : "border-dashed border-neutral-400 bg-[#faf9f6] text-[#354a38] hover:border-[#a6ccac]"
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
-            </div>
+              <div className="mt-8 flex flex-wrap gap-2">
+                {currentQuestion.kind === "single" &&
+                  currentQuestion.options.map((opt) => {
+                    const selected = survey[currentQuestion.id] === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() =>
+                          setSurvey((s) => ({ ...s, [currentQuestion.id]: opt }))
+                        }
+                        className={`cursor-pointer rounded-full border px-4 py-2.5 text-left text-sm transition-all duration-200 active:scale-[0.99] ${
+                          selected
+                            ? "border-[#759d7b] bg-[#cbecd0] text-[#2c3d2f] shadow-sm"
+                            : "border-neutral-300 bg-[#faf9f6] text-[#354a38] hover:border-[#759d7b] hover:bg-[#eef5f0] hover:shadow-md"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                {currentQuestion.kind === "multi" &&
+                  currentQuestion.options.map((opt) => {
+                    const sel = survey[currentQuestion.id];
+                    const arr = Array.isArray(sel) ? sel : [];
+                    const selected = arr.includes(opt);
+                    const maxed =
+                      !!currentQuestion.maxSelections &&
+                      arr.length >= currentQuestion.maxSelections &&
+                      !selected;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        disabled={maxed}
+                        onClick={() => toggleSurveyMulti(currentQuestion, opt)}
+                        className={`cursor-pointer rounded-full border px-4 py-2.5 text-left text-sm transition-all duration-200 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 ${
+                          selected
+                            ? "border-[#759d7b] bg-[#cbecd0] text-[#2c3d2f] shadow-sm"
+                            : "border-dashed border-neutral-400 bg-[#faf9f6] text-[#354a38] hover:border-[#759d7b] hover:bg-[#eef5f0] hover:shadow-md"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+              </div>
 
-            <p className="mt-10 text-xs text-[#6e706e]">
-              Step {step + 1} of {surveySteps}
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              {step > 0 && (
+              <p className="mt-10 text-xs text-[#6e706e]">
+                Step {step + 1} of {surveySteps}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {step > 0 && (
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    className="rounded-full border border-[#759d7b] px-6 py-2.5 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0]"
+                  >
+                    Back
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={goBack}
-                  className="rounded-full border border-[#759d7b] px-6 py-2.5 text-sm font-semibold text-[#354a38] hover:bg-[#cbecd0]"
+                  disabled={!canProceedSurvey}
+                  onClick={goNext}
+                  className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Back
+                  Continue
                 </button>
-              )}
-              <button
-                type="button"
-                disabled={!canProceedSurvey}
-                onClick={goNext}
-                className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Continue
-              </button>
+              </div>
             </div>
-          </>
+          </div>
         )}
 
         {step === lastStepIndex && (
