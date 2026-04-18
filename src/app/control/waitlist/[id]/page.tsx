@@ -52,6 +52,8 @@ export default async function ControlWaitlistSubmissionPage({
   const payload = (row.payload ?? {}) as Record<string, unknown>;
   const payloadDetails = (payload.details ?? {}) as Record<string, unknown>;
   const payloadSurvey = (payload.survey ?? {}) as Record<string, unknown>;
+  const submittedAtRaw =
+    typeof payload.submittedAt === "string" ? payload.submittedAt : null;
   const files = row.files ?? {};
   const fileEntries = Object.entries(files);
   const detailsEntries = Object.entries(payloadDetails);
@@ -81,19 +83,11 @@ export default async function ControlWaitlistSubmissionPage({
           <div>
             <p className="text-sm text-[#a6ccac]">{row.applicant_email ?? "No email provided"}</p>
             <p className="mt-1 text-xs text-[#a6ccac]/80">
-              Submitted at:{" "}
-              {typeof payload.submittedAt === "string"
-                ? payload.submittedAt
-                : "Not provided"}
+              Submitted at: {formatMelbourneDateTime(submittedAtRaw)}
             </p>
           </div>
           <div className="text-right text-xs text-[#a6ccac]">
-            <p>
-              {new Date(row.created_at).toLocaleString("en-AU", {
-                dateStyle: "medium",
-                timeStyle: "short",
-              })}
-            </p>
+            <p>{formatMelbourneDateTime(row.created_at)}</p>
             <p className="mt-1 opacity-80">Submission ID: {row.id}</p>
           </div>
         </div>
@@ -222,6 +216,17 @@ function renderValue(value: unknown) {
   if (typeof value === "object") return JSON.stringify(value);
   const asString = String(value).trim();
   return asString || "—";
+}
+
+function formatMelbourneDateTime(value: string | null) {
+  if (!value) return "Not provided";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-AU", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Australia/Melbourne",
+  }).format(date);
 }
 
 function Info({ label, value }: { label: string; value: string }) {
