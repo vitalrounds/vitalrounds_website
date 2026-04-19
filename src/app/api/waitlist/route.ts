@@ -181,6 +181,36 @@ async function sendWaitlistOnboardingEmail(opts: {
   });
 }
 
+async function sendSupabaseFallbackInviteEmail(opts: {
+  admin: ReturnType<typeof createServiceRoleClient>;
+  req: Request;
+  email: string;
+  name: string | null;
+}) {
+  const redirectTo = `${buildAppOrigin(opts.req)}/auth/callback?next=/customer/dashboard`;
+  const invite = await opts.admin.auth.admin.inviteUserByEmail(opts.email, {
+    redirectTo,
+    data: {
+      role: "customer",
+      source: "waitlist",
+      full_name: opts.name ?? undefined,
+    },
+  });
+
+  if (!invite.error) return;
+  const msg = invite.error.message.toLowerCase();
+  const userExists =
+    msg.includes("already") || msg.includes("exists") || msg.includes("registered");
+  if (!userExists) {
+    throw new Error(`fallback_invite_failed:${invite.error.message}`);
+  }
+
+  const reset = await opts.admin.auth.resetPasswordForEmail(opts.email, { redirectTo });
+  if (reset.error) {
+    throw new Error(`fallback_password_setup_failed:${reset.error.message}`);
+  }
+}
+
 async function sendWaitlistAdminNotification(opts: {
   req: Request;
   submissionId: string;
@@ -327,8 +357,18 @@ export async function POST(req: Request) {
               name: applicantName,
             });
           } catch (notifyError) {
-            // Submission is already persisted; keep success response but log provisioning issues.
-            console.error("[waitlist] account/email workflow", notifyError);
+            // Submission is already persisted; fallback to Supabase-auth emails.
+            console.error("[waitlist] branded account/email workflow", notifyError);
+            try {
+              await sendSupabaseFallbackInviteEmail({
+                admin,
+                req,
+                email: applicantEmail,
+                name: applicantName,
+              });
+            } catch (fallbackError) {
+              console.error("[waitlist] fallback invite workflow", fallbackError);
+            }
           }
         }
 
