@@ -67,7 +67,7 @@ export async function sendWaitlistInviteEmails(input: { emails: string[] }) {
   const appOrigin = buildAppOrigin();
   const waitlistUrl = `${appOrigin}/waitlist`;
   const logoUrl =
-    process.env.WAITLIST_EMAIL_LOGO_URL?.trim() || `${appOrigin}/short-logo.png`;
+    process.env.WAITLIST_EMAIL_LOGO_URL?.trim() || `${appOrigin}/logo-original.png`;
 
   const failed: string[] = [];
   for (const email of emails) {
@@ -78,7 +78,8 @@ export async function sendWaitlistInviteEmails(input: { emails: string[] }) {
         </div>
         <p>Hi,</p>
         <p>You are warmly invited to join the VitalRounds wait list.</p>
-        <p>Submit your application and our team will review your profile for suitable placement opportunities.</p>
+        <p>The wait list is for doctors interested in the VitalRounds observership program in Australia.</p>
+        <p>Submit your application and our team will review your profile for suitable observership placement opportunities.</p>
         <p style="margin: 24px 0;">
           <a href="${waitlistUrl}" style="display:inline-block; background:#759d7b; color:#ffffff; text-decoration:none; padding:10px 16px; border-radius:999px; font-weight:600;">
             Join the waiting list
@@ -91,9 +92,9 @@ export async function sendWaitlistInviteEmails(input: { emails: string[] }) {
     try {
       await sendResendEmail({
         to: email,
-        subject: "Invitation to join the VitalRounds wait list",
+        subject: "Invitation to join the VitalRounds observership wait list",
         html,
-        text: `Hi,\n\nYou are invited to join the VitalRounds wait list.\nSubmit your application here: ${waitlistUrl}\n\nThank you,\nVitalRounds Team`,
+        text: `Hi,\n\nYou are invited to join the VitalRounds wait list for our observership program in Australia.\nSubmit your application here: ${waitlistUrl}\n\nThank you,\nVitalRounds Team`,
       });
     } catch {
       failed.push(email);
