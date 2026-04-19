@@ -91,28 +91,7 @@ async function sendResendEmail(opts: {
   }
 }
 
-async function sendWaitlistConfirmationEmail(opts: {
-  to: string;
-  name: string | null;
-}) {
-  const name = opts.name ?? "there";
-
-  const html = `
-    <p>Hi ${name},</p>
-    <p>Thanks for joining the VitalRounds wait list.</p>
-    <p>We have received your details and will contact you once your turn is up.</p>
-    <p>Kind regards,<br/>VitalRounds Team</p>
-  `;
-
-  await sendResendEmail({
-    to: [opts.to],
-    subject: "You have joined the VitalRounds wait list",
-    html,
-    text: `Hi ${name},\n\nThanks for joining the VitalRounds wait list.\nWe have received your details and will contact you once your turn is up.\n\nKind regards,\nVitalRounds Team`,
-  });
-}
-
-async function provisionApplicantAccount(opts: {
+async function generateApplicantInviteLink(opts: {
   admin: ReturnType<typeof createServiceRoleClient>;
   email: string;
   fullName: string | null;
@@ -120,29 +99,86 @@ async function provisionApplicantAccount(opts: {
 }) {
   const redirectTo = `${buildAppOrigin(opts.req)}/auth/callback?next=/customer/dashboard`;
 
-  const invite = await opts.admin.auth.admin.inviteUserByEmail(opts.email, {
-    redirectTo,
-    data: {
-      role: "customer",
-      source: "waitlist",
-      full_name: opts.fullName ?? undefined,
+  const invite = await opts.admin.auth.admin.generateLink({
+    type: "invite",
+    email: opts.email,
+    options: {
+      redirectTo,
+      data: {
+        role: "customer",
+        source: "waitlist",
+        full_name: opts.fullName ?? undefined,
+      },
     },
   });
 
-  if (!invite.error) return;
+  if (!invite.error && invite.data.properties?.action_link) {
+    return invite.data.properties.action_link;
+  }
 
-  const msg = invite.error.message.toLowerCase();
+  const msg = (invite.error?.message ?? "").toLowerCase();
   const userExists =
     msg.includes("already") || msg.includes("exists") || msg.includes("registered");
   if (!userExists) {
-    throw new Error(`invite_failed:${invite.error.message}`);
+    throw new Error(`invite_failed:${invite.error?.message ?? "unknown error"}`);
   }
 
-  // Existing user: send password setup/reset email so they can finish onboarding.
-  const reset = await opts.admin.auth.resetPasswordForEmail(opts.email, { redirectTo });
-  if (reset.error) {
-    throw new Error(`password_setup_failed:${reset.error.message}`);
+  const recovery = await opts.admin.auth.admin.generateLink({
+    type: "recovery",
+    email: opts.email,
+    options: { redirectTo },
+  });
+  if (recovery.error || !recovery.data.properties?.action_link) {
+    throw new Error(
+      `password_setup_failed:${recovery.error?.message ?? "missing recovery link"}`
+    );
   }
+  return recovery.data.properties.action_link;
+}
+
+async function sendWaitlistOnboardingEmail(opts: {
+  admin: ReturnType<typeof createServiceRoleClient>;
+  req: Request;
+  email: string;
+  name: string | null;
+}) {
+  const inviteLink = await generateApplicantInviteLink({
+    admin: opts.admin,
+    email: opts.email,
+    fullName: opts.name,
+    req: opts.req,
+  });
+  const appOrigin = buildAppOrigin(opts.req);
+  const logoUrl =
+    process.env.WAITLIST_EMAIL_LOGO_URL?.trim() || `${appOrigin}/short-logo.png`;
+  const person = opts.name ?? "there";
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #243329; line-height: 1.6;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="${logoUrl}" alt="VitalRounds" style="max-width: 180px; height: auto;" />
+      </div>
+      <p>Hi ${person},</p>
+      <p>Thank you for submitting your application. You have successfully joined the VitalRounds wait list.</p>
+      <p>We will get back to you once we have a suitable placement.</p>
+      <p>To continue, please create your account and set your password using the invite link below:</p>
+      <p>
+        <a href="${inviteLink}" style="display:inline-block; background:#759d7b; color:#ffffff; text-decoration:none; padding:10px 16px; border-radius:999px; font-weight:600;">
+          Accept invite and create account
+        </a>
+      </p>
+      <p>If the button does not work, copy and paste this link into your browser:</p>
+      <p style="word-break: break-all;"><a href="${inviteLink}">${inviteLink}</a></p>
+      <p>Thanks,<br/>VitalRounds Team</p>
+    </div>
+  `;
+
+  await sendResendEmail({
+    to: [opts.email],
+    subject: "You are on the VitalRounds wait list — create your account",
+    html,
+    text: `Hi ${person},\n\nThank you for submitting your application. You have successfully joined the VitalRounds wait list.\nWe will get back to you once we have a suitable placement.\n\nPlease create your account and set your password using this invite link:\n${inviteLink}\n\nThanks,\nVitalRounds Team`,
+  });
 }
 
 async function sendWaitlistAdminNotification(opts: {
@@ -284,18 +320,12 @@ export async function POST(req: Request) {
 
         if (applicantEmail) {
           try {
-            await Promise.all([
-              sendWaitlistConfirmationEmail({
-                to: applicantEmail,
-                name: applicantName,
-              }),
-              provisionApplicantAccount({
-                admin,
-                email: applicantEmail,
-                fullName: applicantName,
-                req,
-              }),
-            ]);
+            await sendWaitlistOnboardingEmail({
+              admin,
+              req,
+              email: applicantEmail,
+              name: applicantName,
+            });
           } catch (notifyError) {
             // Submission is already persisted; keep success response but log provisioning issues.
             console.error("[waitlist] account/email workflow", notifyError);
