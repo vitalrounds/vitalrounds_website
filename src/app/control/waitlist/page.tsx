@@ -42,6 +42,35 @@ export default async function ControlWaitlistPage() {
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#a6ccac]">
             Click an applicant row to open full details and downloadable documents.
           </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/control/waitlist/invite"
+              className="rounded-full bg-[#759d7b] px-4 py-2 text-sm font-semibold text-white hover:bg-[#5f7362]"
+            >
+              Invite to join wait list
+            </Link>
+            <button
+              type="button"
+              disabled
+              className="rounded-full border border-[#5f7362] px-4 py-2 text-sm font-semibold text-[#a6ccac] opacity-70"
+            >
+              Coming Soon
+            </button>
+            <button
+              type="button"
+              disabled
+              className="rounded-full border border-[#5f7362] px-4 py-2 text-sm font-semibold text-[#a6ccac] opacity-70"
+            >
+              Coming Soon
+            </button>
+            <button
+              type="button"
+              disabled
+              className="rounded-full border border-[#5f7362] px-4 py-2 text-sm font-semibold text-[#a6ccac] opacity-70"
+            >
+              Coming Soon
+            </button>
+          </div>
         </div>
         <Link
           href="/control"
