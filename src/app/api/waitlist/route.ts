@@ -63,10 +63,7 @@ async function sendResendEmail(opts: {
 }) {
   const cfg = getResendConfig();
   if (!cfg) {
-    console.warn(
-      "[waitlist] email skipped: missing RESEND_API_KEY or WAITLIST_FROM_EMAIL"
-    );
-    return;
+    throw new Error("resend_not_configured: missing RESEND_API_KEY or WAITLIST_FROM_EMAIL");
   }
 
   const res = await fetch(RESEND_API_URL, {
@@ -349,6 +346,7 @@ export async function POST(req: Request) {
         }
 
         if (applicantEmail) {
+          let applicantEmailDelivered = false;
           try {
             await sendWaitlistOnboardingEmail({
               admin,
@@ -356,6 +354,7 @@ export async function POST(req: Request) {
               email: applicantEmail,
               name: applicantName,
             });
+            applicantEmailDelivered = true;
           } catch (notifyError) {
             // Submission is already persisted; fallback to Supabase-auth emails.
             console.error("[waitlist] branded account/email workflow", notifyError);
@@ -366,9 +365,16 @@ export async function POST(req: Request) {
                 email: applicantEmail,
                 name: applicantName,
               });
+              applicantEmailDelivered = true;
             } catch (fallbackError) {
               console.error("[waitlist] fallback invite workflow", fallbackError);
             }
+          }
+
+          if (!applicantEmailDelivered) {
+            console.error(
+              "[waitlist] applicant email not delivered by branded or fallback path"
+            );
           }
         }
 
