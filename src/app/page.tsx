@@ -1,6 +1,18 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import RevealOnScroll from "@/components/reveal-on-scroll";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vitalrounds.com.au";
+
+export const metadata: Metadata = {
+  title: "Clinical Observership Programs in Australia for IMGs",
+  description:
+    "Join VitalRounds to access structured clinical observership pathways in Australia for international medical graduates and doctors preparing for local healthcare environments.",
+  alternates: {
+    canonical: "/",
+  },
+};
 
 const valueHighlights = [
   {
@@ -74,7 +86,66 @@ const journeySteps = [
   },
 ];
 
+const faqItems = [
+  {
+    q: "What is the VitalRounds wait list?",
+    a: "The wait list is for doctors and international medical graduates interested in VitalRounds clinical observership opportunities in Australian healthcare settings.",
+  },
+  {
+    q: "Who can apply for observership pathways?",
+    a: "Doctors, including international medical graduates and early-career clinicians, can apply by submitting their details, preferences, and required documents.",
+  },
+  {
+    q: "How are applicants matched?",
+    a: "VitalRounds reviews submissions for completeness and fit, then coordinates potential placement pathways aligned to hospital requirements and applicant goals.",
+  },
+];
+
 export default function Home() {
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "VitalRounds",
+    url: siteUrl,
+    logo: `${siteUrl}/logo-original.png`,
+    email: "admin@vitalrounds.com.au",
+    sameAs: [siteUrl],
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    serviceType: "Clinical observership program coordination",
+    provider: {
+      "@type": "Organization",
+      name: "VitalRounds",
+      url: siteUrl,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Australia",
+    },
+    audience: {
+      "@type": "Audience",
+      audienceType: "Doctors and international medical graduates",
+    },
+    description:
+      "Structured observership pathways and application review workflows for doctors seeking Australian clinical exposure.",
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  };
+
   return (
     <main
       className="min-h-screen overflow-x-clip text-[#2c3d2f]"
@@ -83,6 +154,18 @@ export default function Home() {
           "linear-gradient(105deg, #f5fbf6 0%, #f5fbf6 34%, #ecf4ed 52%, #dfece2 72%, #d4e4d6 100%)",
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <section className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-7 md:px-10">
         <Link href="/" className="inline-flex items-center gap-3">
           <Image
@@ -306,6 +389,22 @@ export default function Home() {
             </a>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
+        <RevealOnScroll className="rounded-3xl border border-[#cfe3d3] bg-white p-6">
+          <h2 className="text-2xl font-semibold text-[#2c3d2f]">Frequently asked questions</h2>
+          <div className="mt-5 space-y-4">
+            {faqItems.map((item) => (
+              <details key={item.q} className="rounded-2xl border border-[#d5e9d9] px-4 py-3">
+                <summary className="cursor-pointer text-sm font-semibold text-[#354a38]">
+                  {item.q}
+                </summary>
+                <p className="mt-2 text-sm leading-7 text-[#6e706e]">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </RevealOnScroll>
       </section>
     </main>
   );
