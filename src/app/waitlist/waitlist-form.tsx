@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { COUNTRY_OPTIONS } from "@/lib/waitlist/countries";
 import {
   SPECIALTY_OPTIONS,
@@ -524,9 +524,10 @@ export default function WaitlistForm() {
                   value={details.englishTestScore}
                   onChange={(v) => setDetail("englishTestScore", v)}
                 />
-                <DatePickerField
+                <Field
                   label="English test expiry date"
                   hint="tests expire"
+                  type="date"
                   value={details.englishTestExpiry}
                   onChange={(v) => setDetail("englishTestExpiry", v)}
                 />
@@ -570,10 +571,11 @@ export default function WaitlistForm() {
                   })}
                 </div>
               </div>
-              <DatePickerField
+              <Field
                 label="Preferred start date"
                 required
                 hint="Select your preferred start date"
+                type="date"
                 value={details.preferredStart}
                 onChange={(v) => setDetail("preferredStart", v)}
               />
@@ -766,71 +768,6 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         className="mt-2 w-full rounded-xl border border-[#d5dfd6] bg-white px-3 py-2 text-sm text-[#2c3d2f] outline-none ring-[#759d7b]/30 focus:ring-2"
       />
-    </div>
-  );
-}
-
-function DatePickerField({
-  label,
-  required,
-  hint,
-  value,
-  onChange,
-}: {
-  label: string;
-  required?: boolean;
-  hint?: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const openPicker = () => {
-    const input = inputRef.current;
-    if (!input) return;
-    const picker = input as HTMLInputElement & { showPicker?: () => void };
-    if (typeof picker.showPicker === "function") {
-      picker.showPicker();
-    } else {
-      picker.click();
-    }
-  };
-
-  const displayValue = value
-    ? new Date(`${value}T00:00:00`).toLocaleDateString("en-AU", {
-        dateStyle: "medium",
-      })
-    : "Select date";
-
-  return (
-    <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
-      <label className="text-sm font-semibold text-[#2c3d2f]">
-        {label} {required && <span className="text-red-600">*</span>}
-      </label>
-      {hint && <p className="mt-0.5 text-xs text-[#6e706e]">{hint}</p>}
-      <div
-        className="relative mt-2 flex min-h-11 items-center justify-between rounded-xl border border-[#d5dfd6] bg-white px-3 py-2 text-sm text-[#2c3d2f] ring-[#759d7b]/30 focus-within:ring-2"
-        onClick={openPicker}
-      >
-        <span className={value ? "" : "text-[#6e706e]"}>{displayValue}</span>
-        <span aria-hidden className="text-[#354a38]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm13 8H4v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9ZM6 6H5a1 1 0 0 0-1 1v1h16V7a1 1 0 0 0-1-1h-1v1a1 1 0 1 1-2 0V6H8v1a1 1 0 1 1-2 0V6Z" />
-          </svg>
-        </span>
-        <input
-          ref={inputRef}
-          type="date"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="absolute inset-0 cursor-pointer opacity-0"
-        />
-      </div>
     </div>
   );
 }
