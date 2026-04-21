@@ -29,37 +29,7 @@ const valueHighlights = [
   },
   {
     title: "Role-Specific Portals",
-    description: "Dedicated experiences for hospitals, applicants, and admins.",
-  },
-];
-
-const roleCards = [
-  {
-    heading: "Hospital Workforce Admin",
-    points: [
-      "Manage schedules and participating departments",
-      "Set requirements and approve candidates",
-    ],
-    buttonLabel: "Partner as a Hospital",
-    buttonHref: "mailto:admin@vitalrounds.com.au?subject=Hospital%20Partnership%20Request",
-  },
-  {
-    heading: "Applicants (IMGs & Fresh Graduates)",
-    points: [
-      "Create profile and upload qualifications",
-      "Browse opportunities and submit applications",
-    ],
-    buttonLabel: "Start Applicant Journey",
-    buttonHref: "mailto:admin@vitalrounds.com.au?subject=Applicant%20Registration%20Interest",
-  },
-  {
-    heading: "VitalRounds Admin",
-    points: [
-      "Review applications before hospital routing",
-      "Onboard hospitals and manage access",
-    ],
-    buttonLabel: "Request Admin Access",
-    buttonHref: "mailto:admin@vitalrounds.com.au?subject=Admin%20Access%20Request",
+    description: "Dedicated experiences for hospitals and applicants.",
   },
 ];
 
@@ -184,12 +154,6 @@ export default function Home() {
           >
             Login
           </Link>
-          <a
-            href="#roles"
-            className="hidden rounded-full border border-[#759d7b] px-5 py-2 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] md:inline-flex"
-          >
-            Platform Roles
-          </a>
           <Link
             href="/waitlist"
             className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-[#759d7b] px-4 text-sm font-semibold text-white transition hover:bg-[#5f7362] sm:px-5"
@@ -321,39 +285,6 @@ export default function Home() {
               </article>
             </RevealOnScroll>
           ))}
-        </div>
-      </section>
-
-      <section id="roles" className="bg-[#354a38] py-16 text-white">
-        <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <RevealOnScroll>
-            <h2 className="text-3xl font-semibold md:text-4xl">
-            Three tailored account experiences
-            </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#cbecd0]">
-              Three interfaces. Three workflows. One coordinated platform.
-            </p>
-          </RevealOnScroll>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {roleCards.map((role, index) => (
-              <RevealOnScroll key={role.heading} delayMs={index * 120}>
-                <article className="flex h-full flex-col rounded-3xl border border-[#5f7362] bg-[#2c3d2f] p-6">
-                  <h3 className="text-lg font-semibold">{role.heading}</h3>
-                  <ul className="mt-4 flex-1 space-y-2 text-sm leading-7 text-[#cbecd0]">
-                    {role.points.map((point) => (
-                      <li key={point}>- {point}</li>
-                    ))}
-                  </ul>
-                  <a
-                    href={role.buttonHref}
-                    className="mt-6 inline-flex rounded-full bg-[#a6ccac] px-4 py-2 text-sm font-semibold text-[#2c3d2f] transition hover:bg-[#cbecd0]"
-                  >
-                    {role.buttonLabel}
-                  </a>
-                </article>
-              </RevealOnScroll>
-            ))}
-          </div>
         </div>
       </section>
 
