@@ -524,10 +524,9 @@ export default function WaitlistForm() {
                   value={details.englishTestScore}
                   onChange={(v) => setDetail("englishTestScore", v)}
                 />
-                <Field
+                <DatePickerField
                   label="English test expiry date"
                   hint="tests expire"
-                  type="date"
                   value={details.englishTestExpiry}
                   onChange={(v) => setDetail("englishTestExpiry", v)}
                 />
@@ -814,7 +813,16 @@ function DatePickerField({
         onClick={openPicker}
       >
         <span className={value ? "" : "text-[#6e706e]"}>{displayValue}</span>
-        <span aria-hidden>📅</span>
+        <span aria-hidden className="text-[#354a38]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="h-5 w-5"
+          >
+            <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm13 8H4v9a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-9ZM6 6H5a1 1 0 0 0-1 1v1h16V7a1 1 0 0 0-1-1h-1v1a1 1 0 1 1-2 0V6H8v1a1 1 0 1 1-2 0V6Z" />
+          </svg>
+        </span>
         <input
           ref={inputRef}
           type="date"
