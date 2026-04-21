@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { COUNTRY_OPTIONS } from "@/lib/waitlist/countries";
 import {
   SPECIALTY_OPTIONS,
@@ -139,6 +139,7 @@ export default function WaitlistForm() {
     if (!details.cityCountry.trim()) return "Current city & country is required.";
     if (details.preferredSpecialties.length === 0)
       return "Select at least one preferred specialty / department.";
+    if (!details.visaStatus) return "Current visa status is required.";
     if (!details.preferredStart) return "Preferred start date is required.";
     if (details.additionalNotes.length > 300)
       return "Additional notes must be 300 characters or less.";
@@ -149,13 +150,12 @@ export default function WaitlistForm() {
 
   const validateRegistrationUploads = (): string | null => {
     if (!cvFile) return "Please upload your curriculum vitae (CV).";
-    if (!passportFile) return "Please upload your passport (photo page).";
     if (!degreeCertFile) return "Please upload your medical degree certificate.";
     const check = (f: File | null, label: string) =>
       f && f.size > MAX_UPLOAD_MB * 1024 * 1024 ? `${label} must be ${MAX_UPLOAD_MB}MB or smaller.` : null;
     const errs = [
       check(cvFile, "CV"),
-      check(passportFile, "Passport"),
+      check(passportFile, "Driving licence / passport"),
       check(degreeCertFile, "Medical degree certificate"),
       check(amcPart1File, "AMC Part 1 document"),
       check(englishTestReportFile, "English test report"),
@@ -166,13 +166,15 @@ export default function WaitlistForm() {
     const cvName = cvFile.name.toLowerCase();
     if (!cvName.endsWith(".pdf"))
       return "CV must be a PDF file.";
-    const passName = passportFile.name.toLowerCase();
-    if (
-      !passName.endsWith(".pdf") &&
-      !passName.endsWith(".jpg") &&
-      !passName.endsWith(".jpeg")
-    )
-      return "Passport upload must be PDF or JPG.";
+    if (passportFile) {
+      const passName = passportFile.name.toLowerCase();
+      if (
+        !passName.endsWith(".pdf") &&
+        !passName.endsWith(".jpg") &&
+        !passName.endsWith(".jpeg")
+      )
+        return "Driving licence / passport upload must be PDF or JPG.";
+    }
     const degName = degreeCertFile.name.toLowerCase();
     if (!degName.endsWith(".pdf"))
       return "Medical degree certificate must be a PDF.";
@@ -243,7 +245,7 @@ export default function WaitlistForm() {
         })
       );
       fd.append("cv", cvFile as File);
-      fd.append("passport", passportFile as File);
+      if (passportFile) fd.append("passport", passportFile);
       fd.append("degreeCertificate", degreeCertFile as File);
       if (amcPart1File) fd.append("amcPart1", amcPart1File);
       if (englishTestReportFile) fd.append("englishTestReport", englishTestReportFile);
@@ -531,10 +533,11 @@ export default function WaitlistForm() {
                 />
                 <SelectField
                   label="Current visa status (if in Australia)"
+                  required
                   value={details.visaStatus}
                   onChange={(v) => setDetail("visaStatus", v)}
                   options={VISA_OPTIONS}
-                  placeholderOption="Optional — select status"
+                  placeholderOption="Select visa status"
                 />
               </div>
             </section>
@@ -568,11 +571,10 @@ export default function WaitlistForm() {
                   })}
                 </div>
               </div>
-              <Field
+              <DatePickerField
                 label="Preferred start date"
                 required
-                hint="Date picker or month selector"
-                type="month"
+                hint="Select your preferred start date"
                 value={details.preferredStart}
                 onChange={(v) => setDetail("preferredStart", v)}
               />
@@ -610,9 +612,9 @@ export default function WaitlistForm() {
               <DocumentUploadCard
                 abbr="ID"
                 abbrClassName="bg-violet-100 text-violet-900"
-                title="Passport (photo page)"
-                description="Clear scan or photo of the identity page. Used for identity verification only. PDF or JPG, max 5MB."
-                status="required"
+                title="Driving licence or passport"
+                description="Optional identity document. Upload either your driving licence or passport (photo page). PDF or JPG, max 5MB."
+                status="applicable"
                 accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg"
                 file={passportFile}
                 onChange={setPassportFile}
@@ -769,6 +771,62 @@ function Field({
   );
 }
 
+function DatePickerField({
+  label,
+  required,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  required?: boolean;
+  hint?: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const openPicker = () => {
+    const input = inputRef.current;
+    if (!input) return;
+    const picker = input as HTMLInputElement & { showPicker?: () => void };
+    if (typeof picker.showPicker === "function") {
+      picker.showPicker();
+    } else {
+      picker.click();
+    }
+  };
+
+  const displayValue = value
+    ? new Date(`${value}T00:00:00`).toLocaleDateString("en-AU", {
+        dateStyle: "medium",
+      })
+    : "Select date";
+
+  return (
+    <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
+      <label className="text-sm font-semibold text-[#2c3d2f]">
+        {label} {required && <span className="text-red-600">*</span>}
+      </label>
+      {hint && <p className="mt-0.5 text-xs text-[#6e706e]">{hint}</p>}
+      <div
+        className="relative mt-2 flex min-h-11 items-center justify-between rounded-xl border border-[#d5dfd6] bg-white px-3 py-2 text-sm text-[#2c3d2f] ring-[#759d7b]/30 focus-within:ring-2"
+        onClick={openPicker}
+      >
+        <span className={value ? "" : "text-[#6e706e]"}>{displayValue}</span>
+        <span aria-hidden>📅</span>
+        <input
+          ref={inputRef}
+          type="date"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="absolute inset-0 cursor-pointer opacity-0"
+        />
+      </div>
+    </div>
+  );
+}
+
 function SelectField({
   label,
   required,
@@ -853,7 +911,7 @@ function DocumentUploadCard({
             type="file"
             accept={accept}
             onChange={(e) => onChange(e.target.files?.[0] ?? null)}
-            className="mt-3 block w-full text-sm text-[#354a38] file:mr-3 file:rounded-lg file:border-0 file:bg-[#cbecd0] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[#354a38]"
+            className="mt-3 block w-full cursor-pointer text-sm text-[#354a38] file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#cbecd0] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[#354a38] hover:file:bg-[#b8dfbf]"
           />
           {file && (
             <p className="mt-2 text-xs text-[#6e706e]">
