@@ -149,6 +149,18 @@ export default function Home() {
         </Link>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
+            href="/about"
+            className="hidden rounded-full border border-[#759d7b] px-4 py-2 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] md:inline-flex"
+          >
+            About
+          </Link>
+          <Link
+            href="/contact"
+            className="hidden rounded-full border border-[#759d7b] px-4 py-2 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] md:inline-flex"
+          >
+            Contact
+          </Link>
+          <Link
             href="/login"
             className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full border border-[#759d7b] px-4 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] sm:px-5"
           >
@@ -315,6 +327,12 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 md:px-10">
           <p className="text-sm text-[#6e706e]">© {new Date().getFullYear()} VitalRounds</p>
           <div className="flex gap-4 text-sm text-[#354a38]">
+            <Link href="/about" className="hover:text-[#2c3d2f]">
+              About
+            </Link>
+            <Link href="/contact" className="hover:text-[#2c3d2f]">
+              Contact
+            </Link>
             <a href="mailto:admin@vitalrounds.com.au" className="hover:text-[#2c3d2f]">
               Email
             </a>
