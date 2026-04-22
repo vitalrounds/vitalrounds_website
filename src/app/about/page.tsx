@@ -67,9 +67,10 @@ export default function AboutPage() {
           <div className="md:col-span-8">
             <h2 className="text-2xl font-semibold">Our Goal</h2>
             <p className="mt-3 leading-8 text-[#5f7362]">
-              Our goal is to make clinical exposure more transparent and more attainable for doctors
-              preparing for Australian practice. We focus on consistency, practical readiness, and
-              equitable access to opportunities.
+              IMG doctors, fresh medical graduates, and even medical staff with gaps due to
+              personal reasons are often stuck in a no-clinical-exposure cycle. Our goal is to
+              break this cycle and give them a clear pathway they can confidently pursue toward
+              Australian clinical readiness.
             </p>
           </div>
           <div className="relative overflow-hidden rounded-2xl bg-[#eaf7ec] p-4 md:col-span-4">
