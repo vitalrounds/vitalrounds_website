@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -10,10 +11,18 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-[#f5fbf6] text-[#2c3d2f]">
-      <section className="mx-auto max-w-4xl px-6 py-14 md:px-10">
+    <main
+      className="min-h-screen text-[#2c3d2f]"
+      style={{
+        background:
+          "radial-gradient(circle at 0% 0%, #f8fcf8 0%, #ecf4ed 43%, #e2ede4 72%, #d7e6d9 100%)",
+      }}
+    >
+      <section className="mx-auto max-w-5xl px-6 py-14 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-4xl font-semibold">Contact us</h1>
+          <div className="inline-flex items-center gap-3">
+            <Image src="/logo.png" alt="VitalRounds" width={190} height={42} />
+          </div>
           <Link
             href="/"
             className="rounded-full border border-[#759d7b] px-5 py-2 text-sm font-semibold text-[#354a38] hover:bg-[#cbecd0]"
@@ -22,13 +31,20 @@ export default function ContactPage() {
           </Link>
         </div>
 
-        <p className="mt-4 max-w-2xl leading-8 text-[#5f7362]">
-          We&apos;d love to hear from you. Whether you are an applicant exploring observership
-          opportunities or a hospital interested in partnership, the VitalRounds team can help.
-        </p>
+        <div className="mt-8 rounded-[2rem] border border-[#bfd5c3] bg-gradient-to-r from-[#d5e7d9] via-[#dff0e3] to-[#d3e4d6] p-7 md:p-9">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#354a38]">
+            Contact us
+          </p>
+          <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight md:text-5xl">
+            Let&apos;s discuss your observership pathway or partnership plans.
+          </h1>
+          <p className="mt-4 max-w-2xl leading-8 text-[#4f6553]">
+            Keep it simple: send one email, and we&apos;ll guide you to the right next step.
+          </p>
+        </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <article className="rounded-3xl border border-[#d5e9d9] bg-white p-6">
+          <article className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm">
             <h2 className="text-lg font-semibold">General enquiries</h2>
             <p className="mt-2 text-sm leading-7 text-[#5f7362]">
               Questions about the platform, process, or next steps.
@@ -41,7 +57,7 @@ export default function ContactPage() {
             </a>
           </article>
 
-          <article className="rounded-3xl border border-[#d5e9d9] bg-white p-6">
+          <article className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm">
             <h2 className="text-lg font-semibold">Hospital partnership</h2>
             <p className="mt-2 text-sm leading-7 text-[#5f7362]">
               Discuss onboarding and observership pathway collaboration.
@@ -55,19 +71,29 @@ export default function ContactPage() {
           </article>
         </div>
 
-        <article className="mt-6 rounded-3xl border border-[#d5e9d9] bg-white p-6">
-          <h2 className="text-lg font-semibold">Applicant support</h2>
-          <p className="mt-2 text-sm leading-7 text-[#5f7362]">
-            Need help with your wait list submission or documents? Email us and include your full
-            name and preferred contact email.
-          </p>
-          <a
-            href="mailto:admin@vitalrounds.com.au?subject=Applicant%20Support"
-            className="mt-4 inline-flex rounded-full border border-[#759d7b] px-4 py-2 text-sm font-semibold text-[#354a38] hover:bg-[#cbecd0]"
-          >
-            Get applicant support
-          </a>
-        </article>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <article className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm">
+            <h2 className="text-lg font-semibold">Applicant support</h2>
+            <p className="mt-2 text-sm leading-7 text-[#5f7362]">
+              Need help with your wait list submission or documents? Include your full name and
+              preferred contact email.
+            </p>
+            <a
+              href="mailto:admin@vitalrounds.com.au?subject=Applicant%20Support"
+              className="mt-4 inline-flex rounded-full border border-[#759d7b] px-4 py-2 text-sm font-semibold text-[#354a38] hover:bg-[#cbecd0]"
+            >
+              Get applicant support
+            </a>
+          </article>
+          <article className="rounded-[1.7rem] border border-[#bfd5c3] bg-[#e7f2e9] p-6">
+            <h2 className="text-lg font-semibold">Response expectation</h2>
+            <p className="mt-2 text-sm leading-7 text-[#4f6553]">
+              Most enquiries are answered within 1-2 business days. For faster support, include the
+              purpose of your enquiry in the email subject line.
+            </p>
+            <div className="mt-4 text-sm font-semibold text-[#354a38]">admin@vitalrounds.com.au</div>
+          </article>
+        </div>
       </section>
     </main>
   );

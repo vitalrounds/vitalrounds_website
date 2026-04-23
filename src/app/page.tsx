@@ -16,43 +16,43 @@ export const metadata: Metadata = {
 
 const valueHighlights = [
   {
-    title: "Structured Clinical Observerships",
-    description: "Practical hospital exposure, not recruitment placement.",
+    title: "Structured Observership Pathways",
+    description: "Clear progression, not random application loops.",
   },
   {
-    title: "Australian System Readiness",
-    description: "Learn local workflows, documentation, and communication.",
+    title: "Australian Practice Context",
+    description: "Workflows, communication, and local expectations.",
   },
   {
-    title: "Coordinated Review Pathway",
-    description: "VitalRounds quality-checks every application first.",
+    title: "Coordinated Review",
+    description: "Applicant information is organized before matching.",
   },
   {
-    title: "Role-Specific Portals",
-    description: "Dedicated experiences for hospitals and applicants.",
+    title: "Human + Data Guidance",
+    description: "Better decisions through structured insight and support.",
   },
 ];
 
 const journeySteps = [
   {
     icon: "1",
-    title: "Apply",
-    detail: "Doctors submit profile, documents, and preferences.",
+    title: "Join wait list",
+    detail: "Submit profile and core documents.",
   },
   {
     icon: "2",
-    title: "Pre-Review",
-    detail: "VitalRounds validates completeness and fit.",
+    title: "Readiness review",
+    detail: "VitalRounds checks clarity and fit.",
   },
   {
     icon: "3",
-    title: "Hospital Match",
-    detail: "Eligible applications are routed to programs.",
+    title: "Pathway match",
+    detail: "Potential placements are identified.",
   },
   {
     icon: "4",
-    title: "Decision",
-    detail: "Hospitals review and respond against criteria.",
+    title: "Next step",
+    detail: "You receive practical direction and updates.",
   },
 ];
 
@@ -121,7 +121,7 @@ export default function Home() {
       className="min-h-screen overflow-x-clip text-[#2c3d2f]"
       style={{
         background:
-          "linear-gradient(105deg, #f5fbf6 0%, #f5fbf6 34%, #ecf4ed 52%, #dfece2 72%, #d4e4d6 100%)",
+          "radial-gradient(circle at 0% 0%, #f8fcf8 0%, #ecf4ed 43%, #e2ede4 72%, #d7e6d9 100%)",
       }}
     >
       <script
@@ -175,51 +175,52 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative px-6 pb-24 pt-8 md:px-10">
-        <div className="relative mx-auto grid max-w-7xl items-start gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
-          <RevealOnScroll className="min-w-0 space-y-5 overflow-x-clip lg:col-span-5">
-            <p className="inline-flex rounded-full bg-[#cbecd0] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#354a38]">
+      <section className="relative px-6 pb-16 pt-6 md:px-10 md:pb-20">
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[28rem] max-w-6xl rounded-[2.5rem] bg-gradient-to-br from-[#e9f6eb] via-[#dceadf] to-[#cfdfd3]" />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-12">
+          <RevealOnScroll className="space-y-5 lg:col-span-6">
+            <p className="inline-flex rounded-full border border-[#9bbba0] bg-[#f4faf5]/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#354a38] backdrop-blur-sm">
               Purpose-built for IMG clinical exposure
             </p>
-            <h1 className="max-w-[18ch] text-balance text-4xl font-semibold leading-[1.08] text-[#2c3d2f] md:text-5xl xl:text-[3.35rem]">
+            <h1 className="max-w-[18ch] text-balance text-4xl font-semibold leading-[1.08] text-[#2c3d2f] md:text-5xl xl:text-[3.25rem]">
               Build clinical confidence in Australia through guided observerships.
             </h1>
-            <p className="rounded-2xl border border-[#a6ccac] bg-white px-4 py-3 text-sm font-semibold leading-7 text-[#354a38]">
-              The light at the end of the tunnel for doctors closing local
-              experience gaps.
-            </p>
-            <p className="text-base leading-8 text-[#6e706e] lg:max-w-[28rem]">
-              VitalRounds helps doctors close local experience gaps through
-              structured observership pathways in Australian healthcare settings.
+            <p className="max-w-[30rem] text-base leading-8 text-[#5f7362]">
+              A cleaner, more structured route for doctors closing local experience gaps and
+              preparing for Australian healthcare environments.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
-              <a
-                href="mailto:admin@vitalrounds.com.au?subject=Applicant%20Interest"
+              <Link
+                href="/waitlist"
                 className="rounded-full bg-[#759d7b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5f7362]"
               >
-                Start as Applicant
-              </a>
-              <a
-                href="mailto:admin@vitalrounds.com.au?subject=Hospital%20Program%20Enquiry"
-                className="rounded-full border border-[#759d7b] bg-white px-6 py-3 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0]"
+                Join the wait list
+              </Link>
+              <Link
+                href="/about"
+                className="rounded-full border border-[#759d7b] bg-[#f4faf5]/80 px-6 py-3 text-sm font-semibold text-[#354a38] transition hover:bg-[#dceede]"
               >
-                Register a Hospital Program
-              </a>
+                Explore VitalRounds
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1 text-xs font-medium text-[#4d6450]">
+              <span className="rounded-full bg-[#deecdf] px-3 py-1">IMG focused</span>
+              <span className="rounded-full bg-[#deecdf] px-3 py-1">Guided pathway</span>
+              <span className="rounded-full bg-[#deecdf] px-3 py-1">Hospital-ready profile</span>
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delayMs={150} className="relative z-10 min-w-0 lg:col-span-7">
-            <div
-              className="overflow-hidden rounded-2xl sm:rounded-3xl"
-              style={{ boxShadow: "0 24px 56px -20px rgba(44, 61, 47, 0.35)" }}
-            >
+          <RevealOnScroll delayMs={150} className="relative lg:col-span-6">
+            <div className="absolute -left-4 -top-4 h-24 w-24 rounded-full bg-[#c7dfcb]/80 blur-xl" />
+            <div className="absolute -bottom-5 -right-5 h-28 w-28 rounded-full bg-[#b8d2bc]/70 blur-xl" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-[#c3d9c7]/80 bg-[#eef6ef]/80 p-2 backdrop-blur-sm">
               <Image
                 src="/clinical-network-poster.png"
                 alt="VitalRounds: A New Era in Medical Rounds"
                 width={1200}
                 height={616}
-                className="block h-auto w-full align-middle"
-                sizes="(max-width: 1024px) 100vw, 66vw"
+                className="block h-auto w-full rounded-[1.4rem]"
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
               />
             </div>
@@ -227,98 +228,92 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#eaf7ec] py-16">
+      <section className="py-14 md:py-16">
         <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <RevealOnScroll className="mb-10 max-w-3xl">
-            <h2 className="text-3xl font-semibold text-[#2c3d2f] md:text-4xl">
-              A full pathway from application to hospital review
-            </h2>
-            <p className="mt-4 text-base leading-8 text-[#6e706e]">
-              A clear, guided pathway for applicants, VitalRounds, and hospitals.
+          <RevealOnScroll className="mb-8 max-w-2xl">
+            <h2 className="text-3xl font-semibold md:text-4xl">Why it feels different</h2>
+            <p className="mt-3 text-base leading-7 text-[#5f7362]">
+              Built to reduce friction, uncertainty, and repetition for applicants and partners.
             </p>
           </RevealOnScroll>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             {valueHighlights.map((item, index) => (
-              <RevealOnScroll key={item.title} delayMs={index * 120}>
-                <li className="list-none rounded-3xl border border-[#a6ccac] bg-white p-6">
-                  <h3 className="text-lg font-semibold text-[#354a38]">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-[#6e706e]">
-                    {item.description}
-                  </p>
-                </li>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-16 md:px-10">
-        <RevealOnScroll>
-          <h2 className="text-3xl font-semibold text-[#2c3d2f] md:text-4xl">
-            How it works
-          </h2>
-          <p className="mt-4 max-w-3xl text-base leading-8 text-[#6e706e]">
-            A simple four-step roadmap from application to hospital decision.
-          </p>
-        </RevealOnScroll>
-
-        <div className="relative mt-8 hidden md:block">
-          <div className="absolute left-8 right-8 top-8 h-1 rounded-full bg-[#a6ccac]" />
-          <div className="grid grid-cols-4 gap-4">
-            {journeySteps.map((step, index) => (
-              <RevealOnScroll key={step.title} delayMs={index * 120}>
-                <article className="rounded-3xl border border-[#a6ccac] bg-white p-5">
-                  <div className="mb-4 flex items-center gap-3">
-                    <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#759d7b] text-xs font-bold text-white">
-                      {step.icon}
-                    </span>
-                    <h3 className="text-base font-semibold text-[#354a38]">
-                      {step.title}
-                    </h3>
-                  </div>
-                  <p className="text-sm leading-7 text-[#6e706e]">{step.detail}</p>
+              <RevealOnScroll key={item.title} delayMs={index * 90}>
+                <article className="rounded-3xl border border-[#c8ddcb]/80 bg-[#f6fbf7]/70 p-5 backdrop-blur-sm">
+                  <h3 className="text-base font-semibold text-[#354a38]">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-[#5f7362]">{item.description}</p>
                 </article>
               </RevealOnScroll>
             ))}
           </div>
         </div>
+      </section>
 
-        <div className="mt-8 grid gap-4 md:hidden">
-          {journeySteps.map((step, index) => (
-            <RevealOnScroll key={step.title} delayMs={index * 90}>
-              <article className="rounded-3xl border border-[#a6ccac] bg-white p-5">
-                <div className="mb-3 flex items-center gap-3">
-                  <span className="inline-flex size-8 items-center justify-center rounded-full bg-[#759d7b] text-xs font-bold text-white">
+      <section className="py-14 md:py-16">
+        <div className="mx-auto max-w-6xl px-6 md:px-10">
+          <RevealOnScroll className="mb-8 max-w-2xl">
+            <h2 className="text-3xl font-semibold md:text-4xl">A clear pathway</h2>
+            <p className="mt-3 text-base leading-7 text-[#5f7362]">
+              Four focused steps from wait list to real next action.
+            </p>
+          </RevealOnScroll>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            {journeySteps.map((step, index) => (
+              <RevealOnScroll key={step.title} delayMs={index * 90}>
+                <article className="rounded-2xl border border-[#bfd5c3] bg-[#ebf4ed]/70 p-4">
+                  <div className="mb-3 inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-[#759d7b] px-2 text-xs font-semibold text-white">
                     {step.icon}
-                  </span>
-                  <h3 className="text-base font-semibold text-[#354a38]">{step.title}</h3>
-                </div>
-                <p className="text-sm leading-7 text-[#6e706e]">{step.detail}</p>
-              </article>
-            </RevealOnScroll>
-          ))}
+                  </div>
+                  <h3 className="text-sm font-semibold text-[#354a38]">{step.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-[#5f7362]">{step.detail}</p>
+                </article>
+              </RevealOnScroll>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 md:px-10">
-        <RevealOnScroll className="rounded-[2rem] bg-[#cbecd0] px-8 py-10 md:px-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#354a38]">
-            Ready to launch your pathway?
-          </p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold leading-tight text-[#2c3d2f] md:text-4xl">
-            Whether you are a hospital or an applicant, VitalRounds helps you
-            move with confidence and clarity.
-          </h2>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href="mailto:admin@vitalrounds.com.au?subject=General%20Website%20Enquiry"
-              className="rounded-full bg-[#759d7b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5f7362]"
-            >
-              Contact VitalRounds
-            </a>
-          </div>
-          <div className="mt-6 text-xs text-[#354a38]">
-            Private applicant and partner onboarding is managed directly by VitalRounds.
+      <section className="pb-12 pt-8 md:pb-16">
+        <div className="mx-auto max-w-6xl px-6 md:px-10">
+          <RevealOnScroll className="relative overflow-hidden rounded-[2rem] border border-[#bfd5c3] bg-gradient-to-r from-[#d5e7d9] via-[#dff0e3] to-[#d3e4d6] px-7 py-9 md:px-10 md:py-11">
+            <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#b6d1ba]/60 blur-2xl" />
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#354a38]">
+              Next step
+            </p>
+            <h2 className="mt-3 max-w-2xl text-2xl font-semibold leading-tight text-[#2c3d2f] md:text-3xl">
+              Whether you are applying or exploring partnerships, VitalRounds keeps the pathway
+              simple, clear, and professional.
+            </h2>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/contact"
+                className="rounded-full bg-[#759d7b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5f7362]"
+              >
+                Contact VitalRounds
+              </Link>
+              <Link
+                href="/about"
+                className="rounded-full border border-[#759d7b] bg-[#f4faf5]/80 px-6 py-3 text-sm font-semibold text-[#354a38] transition hover:bg-[#dceede]"
+              >
+                Read our story
+              </Link>
+            </div>
+          </RevealOnScroll>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-14 md:px-10 md:pb-16">
+        <RevealOnScroll className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm">
+          <h2 className="text-2xl font-semibold text-[#2c3d2f]">Frequently asked questions</h2>
+          <div className="mt-4 space-y-3">
+            {faqItems.map((item) => (
+              <details key={item.q} className="rounded-2xl border border-[#d7e8da] bg-[#ffffffa8] px-4 py-3">
+                <summary className="cursor-pointer text-sm font-semibold text-[#354a38]">
+                  {item.q}
+                </summary>
+                <p className="mt-2 text-sm leading-7 text-[#5f7362]">{item.a}</p>
+              </details>
+            ))}
           </div>
         </RevealOnScroll>
       </section>
@@ -338,22 +333,6 @@ export default function Home() {
             </a>
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 pb-16 md:px-10">
-        <RevealOnScroll className="rounded-3xl border border-[#cfe3d3] bg-white p-6">
-          <h2 className="text-2xl font-semibold text-[#2c3d2f]">Frequently asked questions</h2>
-          <div className="mt-5 space-y-4">
-            {faqItems.map((item) => (
-              <details key={item.q} className="rounded-2xl border border-[#d5e9d9] px-4 py-3">
-                <summary className="cursor-pointer text-sm font-semibold text-[#354a38]">
-                  {item.q}
-                </summary>
-                <p className="mt-2 text-sm leading-7 text-[#6e706e]">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </RevealOnScroll>
       </section>
     </main>
   );
