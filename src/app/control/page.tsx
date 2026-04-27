@@ -33,6 +33,15 @@ export default async function ControlHomePage() {
                 Wait list applications
               </Link>
             </li>
+            <li>
+              —{" "}
+              <Link
+                href="/control/sales/brochures"
+                className="font-medium text-[#cbecd0] underline-offset-2 hover:text-white hover:underline"
+              >
+                Sales brochures
+              </Link>
+            </li>
             <li>— Hospital accounts (coming soon)</li>
             <li>— Platform settings (coming soon)</li>
           </ul>
