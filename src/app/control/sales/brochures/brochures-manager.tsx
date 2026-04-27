@@ -196,7 +196,7 @@ export default function BrochuresManager({ initialRows }: { initialRows: Brochur
                   <th className="px-5 py-3">File</th>
                   <th className="px-5 py-3">Updated</th>
                   <th className="px-5 py-3">Size</th>
-                  <th className="px-5 py-3">Actions</th>
+                  <th className="w-[280px] px-5 py-3">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#354a38]">
@@ -218,8 +218,8 @@ export default function BrochuresManager({ initialRows }: { initialRows: Brochur
                       </td>
                       <td className="px-5 py-4 text-[#a6ccac]">{formatDateTime(row.updatedAt)}</td>
                       <td className="px-5 py-4 text-[#a6ccac]">{formatBytes(row.size)}</td>
-                      <td className="px-5 py-4">
-                        <div className="flex flex-wrap gap-2">
+                      <td className="w-[280px] px-5 py-4">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
                           <button
                             type="button"
                             onClick={() => onCreateLink(row.path, true)}
