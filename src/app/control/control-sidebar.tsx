@@ -4,10 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/control", label: "Overview", icon: OverviewIcon },
-  { href: "/control/waitlist", label: "Wait list", icon: WaitlistIcon },
+  { href: "/control", label: "Dashboard", icon: OverviewIcon },
+  { href: "/control/applicants", label: "Applicants", icon: WaitlistIcon },
+  { href: "/control/programs", label: "Our Programs", icon: ProgramsIcon },
   { href: "/control/sales", label: "Sales", icon: SalesIcon },
   { href: "/control/partners", label: "Partners", icon: PartnersIcon },
+  { href: "/control/payments", label: "Payments", icon: PaymentsIcon },
 ] as const;
 
 const bottomItems = [
@@ -127,6 +129,34 @@ function SalesIcon() {
         strokeWidth="1.6"
         strokeLinecap="round"
       />
+    </svg>
+  );
+}
+
+function ProgramsIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M4 5.5A1.5 1.5 0 0 1 5.5 4H16v11.5H5.5A1.5 1.5 0 0 0 4 17V5.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M7 7h6M7 10h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PaymentsIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M3.5 6.5h13v8h-13v-8Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M3.5 8.75h13M6.5 12.25h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
