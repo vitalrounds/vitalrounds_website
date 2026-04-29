@@ -1,22 +1,22 @@
 import Link from "next/link";
-import { PartnersTabs } from "./partners-tabs";
+import { PartnersTabs } from "../partners-tabs";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Partners | VitalRounds Control",
+  title: "Partner onboarding | VitalRounds Control",
 };
 
-export default async function ControlPartnersPage() {
+export default function PartnerOnboardingPage() {
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold text-white">Partners</h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#a6ccac]">
-            Manage hospitals and clinics that partner with VitalRounds.
+            Track onboarding steps for hospitals and clinics joining VitalRounds.
           </p>
-          <PartnersTabs active="list" />
+          <PartnersTabs active="onboarding" />
         </div>
         <Link
           href="/control"
@@ -28,11 +28,11 @@ export default async function ControlPartnersPage() {
 
       <section className="rounded-2xl border border-[#354a38] bg-[#2c3d2f] p-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-[#7a9b80]">
-          Partners list
+          On Boarding
         </p>
-        <h2 className="mt-2 text-xl font-semibold text-white">Hospital and clinic partners</h2>
+        <h2 className="mt-2 text-xl font-semibold text-white">Partner onboarding pipeline</h2>
         <p className="mt-2 max-w-2xl text-sm leading-7 text-[#a6ccac]">
-          Partner records will appear here once partner onboarding and registration are enabled.
+          Pending partner registration, documentation, and approval steps will live here.
         </p>
       </section>
     </div>
