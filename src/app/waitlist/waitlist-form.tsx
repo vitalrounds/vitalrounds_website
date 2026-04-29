@@ -723,41 +723,7 @@ export default function WaitlistForm() {
                 Privacy consent
               </h2>
               <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
-                <div className="space-y-3 text-sm leading-7 text-[#354a38]">
-                  <p className="font-semibold text-[#2c3d2f]">
-                    Please review before submitting your wait list application.
-                  </p>
-                  <p>
-                    By submitting this application, you consent to VitalRounds collecting, storing,
-                    and reviewing the personal information, professional details, and documents you
-                    provide for wait list management, applicant assessment, communication, account
-                    setup, and potential observership placement coordination.
-                  </p>
-                  <p>
-                    Some information may be sensitive, including identity documents, visa details,
-                    registration information, certificates, and medical education records.
-                    VitalRounds will take reasonable steps to protect this information using secure
-                    systems and restricted administrative access, but no online system can be
-                    guaranteed to be completely risk-free.
-                  </p>
-                  <p>
-                    Uploading a driving licence or passport is optional. If you choose to upload one,
-                    you confirm that you understand this is your choice and that it may be used only
-                    for identity review and application administration.
-                  </p>
-                  <p>
-                    You confirm that the information you provide is true and accurate to the best of
-                    your knowledge, and you understand that joining the wait list does not guarantee
-                    acceptance, placement, employment, registration, visa outcome, or any clinical
-                    appointment.
-                  </p>
-                  <p>
-                    You may contact VitalRounds at admin@vitalrounds.com.au to ask about your
-                    submitted information or request deletion, subject to legal, operational, and
-                    record-keeping requirements.
-                  </p>
-                </div>
-                <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-[#d5dfd6] bg-white px-4 py-3">
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#d5dfd6] bg-white px-4 py-3">
                   <input
                     type="checkbox"
                     checked={privacyAccepted}
@@ -770,6 +736,43 @@ export default function WaitlistForm() {
                     <span className="text-red-600"> *</span>
                   </span>
                 </label>
+                <details className="mt-3 rounded-xl border border-[#d5dfd6] bg-white px-4 py-3">
+                  <summary className="cursor-pointer text-sm font-semibold text-[#354a38] underline-offset-4 hover:underline">
+                    View privacy consent terms
+                  </summary>
+                  <div className="mt-3 space-y-3 text-sm leading-7 text-[#354a38]">
+                    <p>
+                      By submitting this application, you consent to VitalRounds collecting,
+                      storing, and reviewing the personal information, professional details, and
+                      documents you provide for wait list management, applicant assessment,
+                      communication, account setup, and potential observership placement
+                      coordination.
+                    </p>
+                    <p>
+                      Some information may be sensitive, including identity documents, visa details,
+                      registration information, certificates, and medical education records.
+                      VitalRounds will take reasonable steps to protect this information using
+                      secure systems and restricted administrative access, but no online system can
+                      be guaranteed to be completely risk-free.
+                    </p>
+                    <p>
+                      Uploading a driving licence or passport is optional. If you choose to upload
+                      one, you confirm that you understand this is your choice and that it may be
+                      used only for identity review and application administration.
+                    </p>
+                    <p>
+                      You confirm that the information you provide is true and accurate to the best
+                      of your knowledge, and you understand that joining the wait list does not
+                      guarantee acceptance, placement, employment, registration, visa outcome, or any
+                      clinical appointment.
+                    </p>
+                    <p>
+                      You may contact VitalRounds at admin@vitalrounds.com.au to ask about your
+                      submitted information or request deletion, subject to legal, operational, and
+                      record-keeping requirements.
+                    </p>
+                  </div>
+                </details>
               </div>
             </section>
 
