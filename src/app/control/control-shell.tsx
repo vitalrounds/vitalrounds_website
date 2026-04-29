@@ -74,12 +74,12 @@ export function ControlShell({ children }: { children: ReactNode }) {
       >
         <style>{controlThemeCss}</style>
         <header className="border-b border-[var(--control-border)] bg-[var(--control-header)]">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-5 py-2.5">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={toggleSidebar}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--control-border)] text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)]"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--control-border)] text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)]"
                 aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
@@ -92,13 +92,13 @@ export function ControlShell({ children }: { children: ReactNode }) {
                   width={190}
                   height={42}
                   priority
-                  className="h-auto w-[155px] sm:w-[180px]"
+                  className="h-auto w-[130px] sm:w-[150px]"
                 />
               </Link>
             </div>
             <Link
               href="/auth/sign-out"
-              className="rounded-full border border-[var(--control-border)] px-4 py-2 text-sm font-semibold text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)]"
+              className="rounded-full border border-[var(--control-border)] px-3.5 py-1.5 text-xs font-semibold text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)]"
             >
               Sign out
             </Link>

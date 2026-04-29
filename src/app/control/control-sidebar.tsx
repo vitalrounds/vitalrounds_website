@@ -18,12 +18,18 @@ export function ControlSidebar({ collapsed }: { collapsed: boolean }) {
   const pathname = usePathname();
 
   return (
-    <aside className="shrink-0 border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-200">
+    <aside
+      className={
+        collapsed
+          ? "w-16 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out"
+          : "w-56 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out"
+      }
+    >
       <nav
         className={
           collapsed
-            ? "sticky top-0 flex h-[calc(100vh-73px)] w-16 flex-col gap-1 px-2 py-6"
-            : "sticky top-0 flex h-[calc(100vh-73px)] w-56 flex-col gap-1 px-3 py-6"
+            ? "sticky top-0 flex h-full min-h-0 w-16 flex-col gap-1 px-2 py-4 transition-[padding] duration-300 ease-in-out"
+            : "sticky top-0 flex h-full min-h-0 w-56 flex-col gap-1 px-3 py-4 transition-[padding] duration-300 ease-in-out"
         }
         aria-label="Control panel"
       >
