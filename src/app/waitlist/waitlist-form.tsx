@@ -82,6 +82,7 @@ export default function WaitlistForm() {
   const [englishTestReportFile, setEnglishTestReportFile] = useState<File | null>(null);
   const [internshipCertFile, setInternshipCertFile] = useState<File | null>(null);
   const [visaFile, setVisaFile] = useState<File | null>(null);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -145,6 +146,8 @@ export default function WaitlistForm() {
       return "Additional notes must be 300 characters or less.";
     if (wordCount(details.personalStatement) > 500)
       return "Personal statement must be 500 words or less.";
+    if (!privacyAccepted)
+      return "Please review and accept the privacy consent before submitting.";
     return null;
   };
 
@@ -240,6 +243,11 @@ export default function WaitlistForm() {
             ...details,
             additionalNotes: details.additionalNotes.trim(),
             personalStatement: details.personalStatement.trim(),
+          },
+          privacyConsent: {
+            accepted: privacyAccepted,
+            acceptedAt: new Date().toISOString(),
+            version: "2026-04-30",
           },
           submittedAt: new Date().toISOString(),
         })
@@ -708,6 +716,61 @@ export default function WaitlistForm() {
                 file={visaFile}
                 onChange={setVisaFile}
               />
+            </section>
+
+            <section className="space-y-4">
+              <h2 className="text-xs font-bold uppercase tracking-[0.14em] text-[#6e706e]">
+                Privacy consent
+              </h2>
+              <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
+                <div className="space-y-3 text-sm leading-7 text-[#354a38]">
+                  <p className="font-semibold text-[#2c3d2f]">
+                    Please review before submitting your wait list application.
+                  </p>
+                  <p>
+                    By submitting this application, you consent to VitalRounds collecting, storing,
+                    and reviewing the personal information, professional details, and documents you
+                    provide for wait list management, applicant assessment, communication, account
+                    setup, and potential observership placement coordination.
+                  </p>
+                  <p>
+                    Some information may be sensitive, including identity documents, visa details,
+                    registration information, certificates, and medical education records.
+                    VitalRounds will take reasonable steps to protect this information using secure
+                    systems and restricted administrative access, but no online system can be
+                    guaranteed to be completely risk-free.
+                  </p>
+                  <p>
+                    Uploading a driving licence or passport is optional. If you choose to upload one,
+                    you confirm that you understand this is your choice and that it may be used only
+                    for identity review and application administration.
+                  </p>
+                  <p>
+                    You confirm that the information you provide is true and accurate to the best of
+                    your knowledge, and you understand that joining the wait list does not guarantee
+                    acceptance, placement, employment, registration, visa outcome, or any clinical
+                    appointment.
+                  </p>
+                  <p>
+                    You may contact VitalRounds at admin@vitalrounds.com.au to ask about your
+                    submitted information or request deletion, subject to legal, operational, and
+                    record-keeping requirements.
+                  </p>
+                </div>
+                <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-[#d5dfd6] bg-white px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={privacyAccepted}
+                    onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                    className="mt-1 h-4 w-4 accent-[#759d7b]"
+                  />
+                  <span className="text-sm leading-6 text-[#354a38]">
+                    I have read and agree to the privacy consent and understand how my information
+                    may be collected, stored, reviewed, and used by VitalRounds.
+                    <span className="text-red-600"> *</span>
+                  </span>
+                </label>
+              </div>
             </section>
 
             {error && (
