@@ -153,6 +153,7 @@ const controlThemeCss = `
     --control-soft: #cbecd0;
     --control-hover: #354a38;
     --control-active: #354a38;
+    --control-table-border: #526656;
   }
 
   .control-shell[data-control-theme="light"] {
@@ -164,8 +165,9 @@ const controlThemeCss = `
     --control-text: #243329;
     --control-muted: #5f7362;
     --control-soft: #354a38;
-    --control-hover: #e4f0e7;
+    --control-hover: #dfeee2;
     --control-active: #d9eadc;
+    --control-table-border: #aab6ad;
   }
 
   .control-shell[data-control-theme="light"] .text-white {
@@ -184,13 +186,23 @@ const controlThemeCss = `
   .control-shell[data-control-theme="light"] .bg-\\[\\#1f2d24\\],
   .control-shell[data-control-theme="light"] .bg-\\[\\#243329\\],
   .control-shell[data-control-theme="light"] .bg-\\[\\#2c3d2f\\] {
-    background-color: #ffffff !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f3faf5 100%) !important;
+  }
+  .control-shell[data-control-theme="light"] .bg-\\[\\#1f2d24\\] {
+    background: #f6fbf7 !important;
+  }
+  .control-shell[data-control-theme="light"] .bg-\\[\\#243329\\] {
+    background: #edf6ef !important;
   }
   .control-shell[data-control-theme="light"] .bg-\\[\\#354a38\\] {
     background-color: #d9eadc !important;
   }
+  .control-shell[data-control-theme="light"] .hover\\:bg-\\[\\#354a38\\]:hover {
+    background-color: #dfeee2 !important;
+  }
   .control-shell[data-control-theme="light"] .border-\\[\\#354a38\\],
-  .control-shell[data-control-theme="light"] .border-\\[\\#5f7362\\] {
+  .control-shell[data-control-theme="light"] .border-\\[\\#5f7362\\],
+  .control-shell[data-control-theme="light"] .border-\\[\\#445a47\\] {
     border-color: #c7ddcb !important;
   }
   .control-shell[data-control-theme="light"] .divide-\\[\\#354a38\\] > :not([hidden]) ~ :not([hidden]) {

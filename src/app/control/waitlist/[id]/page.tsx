@@ -107,11 +107,11 @@ export default async function ControlWaitlistSubmissionPage({
         <section className="mt-6">
           <h3 className="text-sm font-semibold text-white">All details fields</h3>
           {detailsEntries.length > 0 ? (
-            <div className="mt-3 overflow-hidden rounded-xl border border-[#445a47]">
+            <div className="mt-3 overflow-hidden rounded-xl border border-[var(--control-table-border)]">
               <table className="min-w-full text-left text-sm">
                 <tbody>
                   {detailsEntries.map(([key, value]) => (
-                    <tr key={key} className="border-b border-[#445a47] last:border-b-0">
+                    <tr key={key} className="border-b border-[var(--control-table-border)] last:border-b-0">
                       <th className="w-1/3 bg-[#243329] px-3 py-2 text-xs uppercase tracking-wider text-[#a6ccac]">
                         {humanizeKey(key)}
                       </th>
@@ -131,11 +131,11 @@ export default async function ControlWaitlistSubmissionPage({
         <section className="mt-6">
           <h3 className="text-sm font-semibold text-white">All survey answers</h3>
           {surveyEntries.length > 0 ? (
-            <div className="mt-3 overflow-hidden rounded-xl border border-[#445a47]">
+            <div className="mt-3 overflow-hidden rounded-xl border border-[var(--control-table-border)]">
               <table className="min-w-full text-left text-sm">
                 <tbody>
                   {surveyEntries.map(([key, value]) => (
-                    <tr key={key} className="border-b border-[#445a47] last:border-b-0">
+                    <tr key={key} className="border-b border-[var(--control-table-border)] last:border-b-0">
                       <th className="w-1/3 bg-[#243329] px-3 py-2 text-xs uppercase tracking-wider text-[#a6ccac]">
                         {humanizeKey(key)}
                       </th>
@@ -159,7 +159,7 @@ export default async function ControlWaitlistSubmissionPage({
               {fileEntries.map(([key, file]) => (
                 <li
                   key={key}
-                  className="flex items-center justify-between rounded-xl border border-[#445a47] bg-[#243329] px-3 py-2 text-sm"
+                  className="flex items-center justify-between rounded-xl border border-[var(--control-table-border)] bg-[#243329] px-3 py-2 text-sm"
                 >
                   <span className="truncate pr-3 text-[#cbecd0]">{file.name}</span>
                   <Link
@@ -231,7 +231,7 @@ function formatMelbourneDateTime(value: string | null) {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[#445a47] bg-[#243329] px-3 py-2">
+    <div className="rounded-xl border border-[var(--control-table-border)] bg-[#243329] px-3 py-2">
       <dt className="text-xs uppercase tracking-wider text-[#a6ccac]">{label}</dt>
       <dd className="mt-1 text-sm text-[#cbecd0]">{value}</dd>
     </div>

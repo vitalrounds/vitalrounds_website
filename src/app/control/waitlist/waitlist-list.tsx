@@ -89,7 +89,7 @@ export default function WaitlistList({ initialRows }: { initialRows: Row[] }) {
             >
               <Link
                 href={`/control/waitlist/${row.id}`}
-                className="col-span-11 -mx-2 grid grid-cols-11 items-center rounded-lg px-2 py-1 transition hover:bg-[#354a38]"
+                className="col-span-11 -mx-2 grid grid-cols-11 items-center rounded-lg px-2 py-1 transition hover:bg-[var(--control-hover)]"
               >
                 <div className="col-span-4 min-w-0">
                   <p className="truncate font-medium text-white">{name}</p>
