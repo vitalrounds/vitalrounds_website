@@ -792,9 +792,9 @@ export default function WaitlistForm() {
               </button>
               <button
                 type="button"
-                disabled={submitting}
+                disabled={submitting || !privacyAccepted}
                 onClick={handleSubmit}
-                className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:opacity-50"
+                className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600 disabled:opacity-80"
               >
                 {submitting ? "Submitting…" : "Submit wait list"}
               </button>
