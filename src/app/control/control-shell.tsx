@@ -64,7 +64,7 @@ export function ControlShell({ children }: { children: ReactNode }) {
     });
   }
 
-  const logoSrc = theme === "dark" ? "/logo-white.png" : "/logo.png";
+  const logoSrc = theme === "dark" ? "/logo-admin-dark.png" : "/logo-admin-light.png";
 
   return (
     <ControlThemeContext.Provider value={value}>
