@@ -177,8 +177,8 @@ export default function Home() {
 
       <section className="relative px-6 pb-16 pt-6 md:px-10 md:pb-20">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[28rem] max-w-6xl rounded-[2.5rem] bg-gradient-to-br from-[#e9f6eb] via-[#dceadf] to-[#cfdfd3]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12 lg:gap-12">
-          <RevealOnScroll className="space-y-5 lg:col-span-6">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-12 lg:gap-10">
+          <RevealOnScroll className="space-y-5 lg:col-span-5">
             <p className="inline-flex rounded-full border border-[#9bbba0] bg-[#f4faf5]/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#354a38] backdrop-blur-sm">
               Purpose-built for IMG clinical exposure
             </p>
@@ -210,7 +210,7 @@ export default function Home() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delayMs={150} className="relative lg:col-span-6">
+          <RevealOnScroll delayMs={150} className="relative lg:col-span-7 lg:pl-2">
             <div className="absolute -left-4 -top-4 h-24 w-24 rounded-full bg-[#c7dfcb]/80 blur-xl" />
             <div className="absolute -bottom-5 -right-5 h-28 w-28 rounded-full bg-[#b8d2bc]/70 blur-xl" />
             <div className="relative overflow-hidden rounded-[2rem] border border-[#c3d9c7]/80 bg-[#eef6ef]/80 p-2 backdrop-blur-sm">
@@ -220,7 +220,7 @@ export default function Home() {
                 width={1200}
                 height={616}
                 className="block h-auto w-full rounded-[1.4rem]"
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 58vw"
                 priority
               />
             </div>
