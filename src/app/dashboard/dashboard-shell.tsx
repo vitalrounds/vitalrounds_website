@@ -123,7 +123,7 @@ export function DoctorPortalShell({
               <button
                 type="button"
                 onClick={() => setMenuOpen((current) => !current)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#759d7b] text-xs font-bold text-white shadow-sm ring-2 ring-transparent transition hover:scale-105 hover:bg-[#5f8f68] hover:ring-[var(--doctor-border)] focus:outline-none focus:ring-2 focus:ring-[#9bd4a4]"
+                className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#759d7b] text-xs font-bold text-white shadow-sm ring-2 ring-transparent transition hover:scale-105 hover:bg-[#5f8f68] hover:ring-[var(--doctor-border)] focus:outline-none focus:ring-2 focus:ring-[#9bd4a4]"
                 aria-label="Open account menu"
                 aria-expanded={menuOpen}
               >
@@ -367,11 +367,14 @@ const doctorThemeCss = `
   .doctor-shell[data-doctor-theme="light"] .text-\\[\\#cbecd0\\] { color: #354a38 !important; }
   .doctor-shell[data-doctor-theme="light"] .text-\\[\\#a6ccac\\],
   .doctor-shell[data-doctor-theme="light"] .text-\\[\\#86aa8d\\] { color: #5f7362 !important; }
+  .doctor-shell[data-doctor-theme="light"] .text-\\[\\#9bd4a4\\] { color: #4f7e57 !important; }
   .doctor-shell[data-doctor-theme="light"] .bg-\\[\\#0f1f14\\],
   .doctor-shell[data-doctor-theme="light"] .bg-\\[\\#132318\\],
   .doctor-shell[data-doctor-theme="light"] .bg-\\[\\#1a2b1e\\] {
     background: linear-gradient(135deg, #ffffff 0%, #f3faf5 100%) !important;
   }
+  .doctor-shell[data-doctor-theme="light"] .bg-\\[\\#243329\\] { background: #edf6ef !important; }
   .doctor-shell[data-doctor-theme="light"] .bg-\\[\\#28452f\\] { background: #d9eadc !important; }
+  .doctor-shell[data-doctor-theme="light"] .border-\\[\\#354a38\\],
   .doctor-shell[data-doctor-theme="light"] .border-\\[\\#223a29\\] { border-color: #c7ddcb !important; }
 `;

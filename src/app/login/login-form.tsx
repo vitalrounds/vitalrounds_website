@@ -21,6 +21,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
 
   const errorParam = searchParams.get("error");
   const errorHint = useMemo(() => {
@@ -38,6 +39,26 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
     e.preventDefault();
     setMessage(null);
     setLoading(true);
+    if (forgotMode) {
+      try {
+        const res = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const body = await res.json().catch(() => ({}));
+        setMessage(
+          res.ok
+            ? "If an account exists for this email, a reset link has been sent."
+            : body.error ?? "Could not send reset link.",
+        );
+      } catch {
+        setMessage("Something went wrong.");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
     try {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -99,10 +120,13 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       className="mx-auto max-w-md space-y-5 rounded-3xl border border-[#a6ccac] bg-white p-8 shadow-sm"
     >
       <div>
-        <h1 className="text-2xl font-semibold text-[#2c3d2f]">Sign in</h1>
+        <h1 className="text-2xl font-semibold text-[#2c3d2f]">
+          {forgotMode ? "Reset password" : "Sign in"}
+        </h1>
         <p className="mt-2 text-sm text-[#6e706e]">
-          IMGs and hospitals use the same login. You will be sent to the right
-          workspace automatically.
+          {forgotMode
+            ? "Enter your email and we will send a secure password reset link."
+            : "IMGs and hospitals use the same login. You will be sent to the right workspace automatically."}
         </p>
       </div>
 
@@ -124,17 +148,19 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
         />
       </label>
 
-      <label className="block text-sm font-medium text-[#354a38]">
-        Password
-        <input
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-[#cbecd0] px-3 py-2 text-[#2c3d2f] outline-none focus:border-[#759d7b]"
-        />
-      </label>
+      {!forgotMode ? (
+        <label className="block text-sm font-medium text-[#354a38]">
+          Password
+          <input
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="mt-1 w-full rounded-xl border border-[#cbecd0] px-3 py-2 text-[#2c3d2f] outline-none focus:border-[#759d7b]"
+          />
+        </label>
+      ) : null}
 
       {message ? (
         <p className="text-sm text-red-700" role="alert">
@@ -147,7 +173,17 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
         disabled={loading}
         className="w-full rounded-full bg-[#759d7b] py-3 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:opacity-60"
       >
-        {loading ? "Signing in…" : "Sign in"}
+        {loading ? (forgotMode ? "Sending..." : "Signing in...") : forgotMode ? "Send reset link" : "Sign in"}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setForgotMode((current) => !current);
+          setMessage(null);
+        }}
+        className="w-full text-center text-sm font-semibold text-[#354a38] underline-offset-4 hover:underline"
+      >
+        {forgotMode ? "Back to sign in" : "Forgot your password?"}
       </button>
       <div className="rounded-2xl border border-[#dfece0] bg-[#f5fbf6] px-4 py-3 text-center text-sm text-[#5f7362]">
         New applicant?{" "}
