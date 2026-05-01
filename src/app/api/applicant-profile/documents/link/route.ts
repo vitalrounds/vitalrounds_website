@@ -8,8 +8,9 @@ const APPLICANT_DOCUMENTS_BUCKET =
 export async function POST(req: Request) {
   const supabase = await createServerSupabaseClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   if (!user || user.user_metadata?.role !== "applicant") {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });

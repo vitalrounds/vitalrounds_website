@@ -6,8 +6,9 @@ import { ProfilePanel } from "./profile-panel";
 export default async function DoctorProfilePage() {
   const supabase = await createServerSupabaseClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   if (!user) redirect("/login?next=/dashboard/profile");
   if (user.user_metadata?.role !== "applicant") redirect("/login?error=wrong_role");
