@@ -115,6 +115,22 @@ export async function updateSession(request: NextRequest) {
 
   // /control access checks run in the control layout with a server-side guard.
 
+  if (pathname.startsWith("/dashboard")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("next", pathname);
+      return redirectWithSession(url);
+    }
+    const role = user.user_metadata?.role as string | undefined;
+    if (role !== "applicant") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("error", "wrong_role");
+      return redirectWithSession(url);
+    }
+  }
+
   if (pathname.startsWith("/customer")) {
     if (!user) {
       const url = request.nextUrl.clone();

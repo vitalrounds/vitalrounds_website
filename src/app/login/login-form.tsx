@@ -68,6 +68,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       const safeNext =
         nextPath &&
         ((role === "customer" && nextPath.startsWith("/customer")) ||
+          (role === "applicant" && nextPath.startsWith("/dashboard")) ||
           (role === "provider" && nextPath.startsWith("/provider")) ||
           (role === "admin" && nextPath.startsWith("/control")));
 

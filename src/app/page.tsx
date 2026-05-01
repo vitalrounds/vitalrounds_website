@@ -167,6 +167,12 @@ export default function Home() {
             Login
           </Link>
           <Link
+            href="/signup"
+            className="hidden h-10 items-center justify-center whitespace-nowrap rounded-full border border-[#759d7b] px-4 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] sm:inline-flex sm:px-5"
+          >
+            Sign-up
+          </Link>
+          <Link
             href="/waitlist"
             className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-[#759d7b] px-4 text-sm font-semibold text-white transition hover:bg-[#5f7362] sm:px-5"
           >
@@ -195,6 +201,12 @@ export default function Home() {
                 className="rounded-full bg-[#759d7b] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#5f7362]"
               >
                 Join the wait list
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full border border-[#759d7b] bg-[#f4faf5]/80 px-6 py-3 text-sm font-semibold text-[#354a38] transition hover:bg-[#dceede]"
+              >
+                Sign-up
               </Link>
               <Link
                 href="/about"

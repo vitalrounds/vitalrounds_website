@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getSupabaseCookieOptions } from "@/lib/supabase/cookie-options";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 const supabaseProjectId =
   process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID ??
@@ -44,6 +45,26 @@ export async function GET(request: Request) {
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
     return NextResponse.redirect(`${origin}/login?error=auth`);
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.user_metadata?.role === "applicant") {
+    try {
+      const admin = createServiceRoleClient();
+      await admin
+        .from("applicant_profiles")
+        .update({
+          status: "active",
+          email_verified_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+    } catch {
+      // Applicant can still reach the dashboard; the page will show pending if the profile update failed.
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`);

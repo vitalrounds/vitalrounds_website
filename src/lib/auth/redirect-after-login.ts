@@ -1,10 +1,10 @@
 import type { User } from "@supabase/supabase-js";
 
-export type AppRole = "admin" | "customer" | "provider";
+export type AppRole = "admin" | "customer" | "provider" | "applicant";
 
 export function getRoleFromUser(user: User | null): AppRole | null {
   const role = user?.user_metadata?.role;
-  if (role === "admin" || role === "customer" || role === "provider") {
+  if (role === "admin" || role === "customer" || role === "provider" || role === "applicant") {
     return role;
   }
   return null;
@@ -21,6 +21,7 @@ export function getPostLoginPath(
     return "/control";
   }
   if (role === "customer") return "/customer/dashboard";
+  if (role === "applicant") return "/dashboard";
   if (role === "provider") return "/provider/dashboard";
   return "/login";
 }
