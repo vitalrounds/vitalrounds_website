@@ -14,14 +14,26 @@ export default async function DoctorDashboardLayout({ children }: { children: Re
 
   let status = "pending_email_verification";
   let fullName = user.user_metadata?.full_name as string | undefined;
+  let avatarPath: string | undefined;
+  let avatarPosition: string | undefined;
   try {
     const admin = createServiceRoleClient();
     const { data } = await admin
       .from("applicant_profiles")
-      .select("status, full_name")
+      .select("status, full_name, documents")
       .eq("user_id", user.id)
       .maybeSingle();
     fullName = data?.full_name ?? fullName;
+    const avatar =
+      data?.documents &&
+      typeof data.documents === "object" &&
+      "avatar" in data.documents &&
+      data.documents.avatar &&
+      typeof data.documents.avatar === "object"
+        ? (data.documents.avatar as Record<string, unknown>)
+        : null;
+    avatarPath = typeof avatar?.path === "string" ? avatar.path : undefined;
+    avatarPosition = typeof avatar?.avatarPosition === "string" ? avatar.avatarPosition : undefined;
     const { data: authUser } = await admin.auth.admin.getUserById(user.id);
     const verified = Boolean(authUser.user?.email_confirmed_at ?? user.email_confirmed_at);
     if (verified && data?.status !== "active") {
@@ -58,5 +70,13 @@ export default async function DoctorDashboardLayout({ children }: { children: Re
     );
   }
 
-  return <DoctorPortalShell userName={fullName ?? user.email ?? "Doctor"}>{children}</DoctorPortalShell>;
+  return (
+    <DoctorPortalShell
+      userName={fullName ?? user.email ?? "Doctor"}
+      avatarPath={avatarPath}
+      avatarPosition={avatarPosition}
+    >
+      {children}
+    </DoctorPortalShell>
+  );
 }

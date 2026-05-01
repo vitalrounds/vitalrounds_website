@@ -34,14 +34,20 @@ const themeOptions = [
 export function DoctorPortalShell({
   children,
   userName,
+  avatarPath,
+  avatarPosition,
 }: {
   children: ReactNode;
   userName: string;
+  avatarPath?: string;
+  avatarPosition?: string;
 }) {
   const pathname = usePathname();
   const [theme, setTheme] = useState<Theme>("dark");
   const [collapsed, setCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [headerAvatarUrl, setHeaderAvatarUrl] = useState<string | null>(null);
+  const [headerAvatarPosition, setHeaderAvatarPosition] = useState(avatarPosition ?? "50% 50%");
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("vitalrounds-doctor-theme");
@@ -73,6 +79,49 @@ export function DoctorPortalShell({
         window.removeEventListener(eventName, resetIdleTimer);
       });
     };
+  }, []);
+
+  useEffect(() => {
+    if (!avatarPath) {
+      setHeaderAvatarUrl(null);
+      return;
+    }
+
+    let cancelled = false;
+    void getSignedAvatarUrl(avatarPath).then((url) => {
+      if (!cancelled) setHeaderAvatarUrl(url);
+    });
+    setHeaderAvatarPosition(avatarPosition ?? "50% 50%");
+
+    return () => {
+      cancelled = true;
+    };
+  }, [avatarPath, avatarPosition]);
+
+  useEffect(() => {
+    const handleAvatarChange = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        path?: string;
+        avatarPosition?: string;
+        removed?: boolean;
+      }>).detail;
+
+      if (detail?.removed) {
+        setHeaderAvatarUrl(null);
+        setHeaderAvatarPosition("50% 50%");
+        return;
+      }
+
+      if (detail?.path) {
+        setHeaderAvatarPosition(detail.avatarPosition ?? "50% 50%");
+        void getSignedAvatarUrl(detail.path).then((url) => {
+          setHeaderAvatarUrl(url);
+        });
+      }
+    };
+
+    window.addEventListener("vitalrounds-avatar-change", handleAvatarChange);
+    return () => window.removeEventListener("vitalrounds-avatar-change", handleAvatarChange);
   }, []);
 
   function toggleSidebar() {
@@ -127,7 +176,17 @@ export function DoctorPortalShell({
                 aria-label="Open account menu"
                 aria-expanded={menuOpen}
               >
-                {initials}
+                {headerAvatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={headerAvatarUrl}
+                    alt="Profile avatar"
+                    className="h-full w-full rounded-full object-cover"
+                    style={{ objectPosition: headerAvatarPosition }}
+                  />
+                ) : (
+                  initials
+                )}
               </button>
               <div
                 className={
@@ -294,6 +353,16 @@ function getInitials(name: string) {
   const first = parts[0]?.[0] ?? "D";
   const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : "";
   return `${first}${last}`.toUpperCase();
+}
+
+async function getSignedAvatarUrl(path: string) {
+  const res = await fetch("/api/applicant-profile/documents/link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ path }),
+  });
+  const body = await res.json().catch(() => ({}));
+  return res.ok && typeof body.url === "string" ? body.url : null;
 }
 
 function ChevronLeftIcon() {

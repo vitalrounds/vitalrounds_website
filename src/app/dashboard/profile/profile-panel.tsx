@@ -141,6 +141,17 @@ export function ProfilePanel({
     setSelectedAvatarFile(null);
     if (selectedAvatarUrl) URL.revokeObjectURL(selectedAvatarUrl);
     setSelectedAvatarUrl(null);
+    const uploadedAvatar = body.document as DocumentRecord | undefined;
+    if (uploadedAvatar?.path) {
+      window.dispatchEvent(
+        new CustomEvent("vitalrounds-avatar-change", {
+          detail: {
+            path: uploadedAvatar.path,
+            avatarPosition: uploadedAvatar.avatarPosition ?? avatarPosition,
+          },
+        }),
+      );
+    }
     setMessage("Profile photo updated.");
   }
 
@@ -157,6 +168,11 @@ export function ProfilePanel({
     }
     setDocuments(body.documents ?? {});
     setAvatarUrl(null);
+    window.dispatchEvent(
+      new CustomEvent("vitalrounds-avatar-change", {
+        detail: { removed: true },
+      }),
+    );
     setMessage("Profile photo removed.");
   }
 
