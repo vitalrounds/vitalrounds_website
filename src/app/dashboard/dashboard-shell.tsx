@@ -203,7 +203,7 @@ export function DoctorPortalShell({
                   Account
                 </Link>
                 <Link
-                  href="/dashboard/payments"
+                  href="/dashboard/billing"
                   className="block rounded-xl px-3 py-2 text-sm font-semibold text-[var(--doctor-soft)] hover:bg-[var(--doctor-hover)]"
                   onClick={() => setMenuOpen(false)}
                 >
