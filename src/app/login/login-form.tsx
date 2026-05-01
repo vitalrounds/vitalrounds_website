@@ -74,7 +74,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       const role = getRoleFromUser(user);
       if (!role) {
         setMessage(
-          "Your account has no role set. Ask VitalRounds to assign customer, provider, or admin in Supabase user metadata."
+          "Your account has no role set. Ask VitalRounds to assign applicant, partner, or admin access."
         );
         await supabase.auth.signOut();
         setLoading(false);
@@ -90,7 +90,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       const safeNext =
         nextPath &&
         ((role === "customer" && nextPath.startsWith("/customer")) ||
-          (role === "provider" && nextPath.startsWith("/provider")) ||
+          ((role === "provider" || role === "partner") && nextPath.startsWith("/provider")) ||
           (role === "admin" && nextPath.startsWith("/control")));
 
       if (safeNext) {
@@ -126,7 +126,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
         <p className="mt-2 text-sm text-[#6e706e]">
           {forgotMode
             ? "Enter your email and we will send a secure password reset link."
-            : "IMGs and hospitals use the same login. You will be sent to the right workspace automatically."}
+            : "Applicants, partners, and admins use the same login. You will be sent to the right secure workspace automatically."}
         </p>
       </div>
 

@@ -1,28 +1,22 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { PartnerPortalShell } from "./partner-shell";
 
-export default function ProviderLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="min-h-screen bg-[#f5fbf6] text-[#2c3d2f]">
-      <header className="border-b border-[#cbecd0] bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/provider/dashboard" className="text-sm font-semibold text-[#354a38]">
-            VitalRounds — Hospital portal
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/" className="text-[#6e706e] hover:text-[#354a38]">
-              Home
-            </Link>
-            <Link href="/auth/sign-out" className="text-[#759d7b] hover:text-[#5f7362]">
-              Sign out
-            </Link>
-          </nav>
-        </div>
-      </header>
-      <div className="mx-auto max-w-6xl px-6 py-10">{children}</div>
-    </div>
-  );
+export default async function PartnerLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
+
+  if (!user) redirect("/login?next=/provider/dashboard");
+  const role = user.user_metadata?.role;
+  if (role !== "provider" && role !== "partner") redirect("/login?error=wrong_role");
+
+  const userName =
+    typeof user.user_metadata?.organization_name === "string"
+      ? user.user_metadata.organization_name
+      : user.email ?? "Partner";
+
+  return <PartnerPortalShell userName={userName}>{children}</PartnerPortalShell>;
 }

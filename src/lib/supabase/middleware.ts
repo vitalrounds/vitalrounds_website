@@ -155,7 +155,7 @@ export async function updateSession(request: NextRequest) {
       return redirectWithSession(url);
     }
     const role = user.user_metadata?.role as string | undefined;
-    if (role !== "provider") {
+    if (role !== "provider" && role !== "partner") {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       url.searchParams.set("error", "wrong_role");
