@@ -119,6 +119,42 @@ export default function ApplicantSignupForm() {
     return null;
   }
 
+  function validateStep(currentStep: number) {
+    if (currentStep === 0) {
+      const missing = SURVEY_QUESTIONS.find(
+        (q) => !survey[q.id] || (Array.isArray(survey[q.id]) && survey[q.id].length === 0),
+      );
+      return missing ? `Please answer question ${missing.questionNumber}: ${missing.prompt}` : null;
+    }
+    if (currentStep === 1) {
+      if (!details.fullLegalName.trim()) return "Full legal name is required.";
+      if (!details.dateOfBirth) return "Date of birth is required.";
+      if (!details.nationality) return "Nationality is required.";
+      if (!details.degreeCountry) return "Country of medical degree is required.";
+      if (!details.degreeInstitution.trim()) return "Medical degree and institution is required.";
+      if (!details.email.trim()) return "Email is required.";
+      if (!details.phone.trim()) return "Phone number is required.";
+      if (!details.cityCountry.trim()) return "Current city and country is required.";
+      if (!details.visaStatus) return "Current visa status is required.";
+      if (details.preferredSpecialties.length === 0) return "Select at least one specialty.";
+    }
+    if (currentStep === 2) {
+      if (!files.cv) return "Please upload your CV.";
+      if (!files.degreeCertificate) return "Please upload your medical degree certificate.";
+    }
+    return null;
+  }
+
+  function continueToNextStep() {
+    const stepError = validateStep(step);
+    if (stepError) {
+      setError(stepError);
+      return;
+    }
+    setError(null);
+    goToStep(Math.min(3, step + 1));
+  }
+
   async function submit() {
     const validation = validate();
     if (validation) {
@@ -303,7 +339,7 @@ export default function ApplicantSignupForm() {
               <Check ok={passwordChecks.special} text="Special character" />
             </ul>
           </div>
-          <section className="space-y-3">
+          <section className="mt-5 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-[#6e706e]">
               Privacy consent
             </h3>
@@ -370,7 +406,7 @@ export default function ApplicantSignupForm() {
           Back
         </button>
         {step < 3 ? (
-          <button type="button" onClick={() => goToStep(Math.min(3, step + 1))} className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white">
+          <button type="button" onClick={continueToNextStep} className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white">
             Continue
           </button>
         ) : (

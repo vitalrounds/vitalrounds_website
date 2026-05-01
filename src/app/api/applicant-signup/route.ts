@@ -1,17 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
-const supabaseProjectId =
-  process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID ??
-  process.env.SUPABASE_PROJECT_ID ??
-  "jxumcqmagdwyvsanmauw";
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ??
-  process.env.SUPABASE_URL ??
-  `https://${supabaseProjectId}.supabase.co`;
-const supabaseAnonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY;
+const RESEND_API_URL = "https://api.resend.com/emails";
 const APPLICANT_DOCUMENTS_BUCKET =
   process.env.APPLICANT_DOCUMENTS_BUCKET?.trim() || "applicant-documents";
 
@@ -29,6 +19,46 @@ function buildAppOrigin(req: Request) {
   const configured = process.env.APP_ORIGIN?.trim();
   if (configured) return configured.replace(/\/$/, "");
   return new URL(req.url).origin;
+}
+
+function getResendConfig() {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.WAITLIST_FROM_EMAIL?.trim();
+  const replyTo = process.env.WAITLIST_REPLY_TO?.trim() || undefined;
+  if (!apiKey || !from) return null;
+  return { apiKey, from, replyTo };
+}
+
+async function sendResendEmail(opts: {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}) {
+  const cfg = getResendConfig();
+  if (!cfg) {
+    throw new Error("resend_not_configured");
+  }
+
+  const res = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${cfg.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: cfg.from,
+      to: [opts.to],
+      reply_to: cfg.replyTo ? [cfg.replyTo] : undefined,
+      subject: opts.subject,
+      html: opts.html,
+      text: opts.text,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`resend_failed:${res.status}:${await res.text()}`);
+  }
 }
 
 function sanitizeFileName(name: string) {
@@ -62,10 +92,6 @@ function passwordIsStrong(password: string) {
 }
 
 export async function POST(req: Request) {
-  if (!supabaseAnonKey) {
-    return NextResponse.json({ error: "Auth is not configured." }, { status: 500 });
-  }
-
   const form = await req.formData();
   const rawJson = form.get("json");
   const password = String(form.get("password") ?? "");
@@ -95,15 +121,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Full name and email are required." }, { status: 400 });
   }
 
-  const anon = createClient(supabaseUrl, supabaseAnonKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  const admin = createServiceRoleClient();
   const redirectTo = `${buildAppOrigin(req)}/auth/callback?next=/dashboard`;
-  const signUp = await anon.auth.signUp({
+  const signUp = await admin.auth.admin.generateLink({
+    type: "signup",
     email,
     password,
     options: {
-      emailRedirectTo: redirectTo,
+      redirectTo,
       data: {
         role: "applicant",
         source: "public_signup",
@@ -112,7 +137,7 @@ export async function POST(req: Request) {
     },
   });
 
-  if (signUp.error || !signUp.data.user) {
+  if (signUp.error || !signUp.data.user || !signUp.data.properties?.action_link) {
     return NextResponse.json(
       { error: signUp.error?.message || "Could not create applicant account." },
       { status: 400 },
@@ -120,7 +145,6 @@ export async function POST(req: Request) {
   }
 
   const userId = signUp.data.user.id;
-  const admin = createServiceRoleClient();
   await ensureBucket(admin);
 
   const documents: Record<string, unknown> = {};
@@ -146,19 +170,18 @@ export async function POST(req: Request) {
     }
   }
 
-  const confirmed = Boolean(signUp.data.user.email_confirmed_at);
   const { error: profileError } = await admin.from("applicant_profiles").upsert({
     user_id: userId,
     email,
     full_name: fullName,
-    status: confirmed ? "active" : "pending_email_verification",
+    status: "pending_email_verification",
     survey: parsed.survey ?? {},
     details: {
       ...details,
       privacyConsent: parsed.privacyConsent ?? null,
     },
     documents,
-    email_verified_at: confirmed ? new Date().toISOString() : null,
+    email_verified_at: null,
     updated_at: new Date().toISOString(),
   });
 
@@ -179,5 +202,32 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, requiresEmailVerification: !confirmed });
+  const appOrigin = buildAppOrigin(req);
+  const logoUrl = process.env.WAITLIST_EMAIL_LOGO_URL?.trim() || `${appOrigin}/logo-original.png`;
+  const verifyLink = signUp.data.properties.action_link;
+  await sendResendEmail({
+    to: email,
+    subject: "Confirm your VitalRounds applicant account",
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #243329; line-height: 1.6;">
+        <div style="text-align:center; margin-bottom:20px;">
+          <img src="${logoUrl}" alt="VitalRounds" style="max-width:180px; height:auto;" />
+        </div>
+        <p>Hi ${fullName},</p>
+        <p>Thank you for creating your VitalRounds applicant account.</p>
+        <p>Please confirm your email address to activate your doctor portal.</p>
+        <p style="margin: 24px 0;">
+          <a href="${verifyLink}" style="display:inline-block; background:#759d7b; color:#ffffff; text-decoration:none; padding:11px 18px; border-radius:999px; font-weight:600;">
+            Confirm email address
+          </a>
+        </p>
+        <p>If the button does not work, copy and paste this link into your browser:</p>
+        <p style="word-break:break-all;"><a href="${verifyLink}">${verifyLink}</a></p>
+        <p>Thanks,<br/>VitalRounds Team</p>
+      </div>
+    `,
+    text: `Hi ${fullName},\n\nThank you for creating your VitalRounds applicant account.\nPlease confirm your email address to activate your doctor portal:\n${verifyLink}\n\nThanks,\nVitalRounds Team`,
+  });
+
+  return NextResponse.json({ ok: true, requiresEmailVerification: true });
 }

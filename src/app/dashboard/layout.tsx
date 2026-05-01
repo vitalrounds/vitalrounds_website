@@ -20,7 +20,21 @@ export default async function DoctorDashboardLayout({ children }: { children: Re
       .select("status")
       .eq("user_id", user.id)
       .maybeSingle();
-    status = data?.status ?? (user.email_confirmed_at ? "active" : "pending_email_verification");
+    const { data: authUser } = await admin.auth.admin.getUserById(user.id);
+    const verified = Boolean(authUser.user?.email_confirmed_at ?? user.email_confirmed_at);
+    if (verified && data?.status !== "active") {
+      await admin
+        .from("applicant_profiles")
+        .update({
+          status: "active",
+          email_verified_at: authUser.user?.email_confirmed_at ?? new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
+      status = "active";
+    } else {
+      status = data?.status ?? (verified ? "active" : "pending_email_verification");
+    }
   } catch {
     status = user.email_confirmed_at ? "active" : "pending_email_verification";
   }
