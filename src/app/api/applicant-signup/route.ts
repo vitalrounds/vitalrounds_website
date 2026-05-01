@@ -79,6 +79,7 @@ export async function POST(req: Request) {
   const parsed = JSON.parse(rawJson) as {
     survey?: Record<string, unknown>;
     details?: Record<string, unknown>;
+    privacyConsent?: Record<string, unknown>;
   };
   const details = parsed.details ?? {};
   const email =
@@ -152,7 +153,10 @@ export async function POST(req: Request) {
     full_name: fullName,
     status: confirmed ? "active" : "pending_email_verification",
     survey: parsed.survey ?? {},
-    details,
+    details: {
+      ...details,
+      privacyConsent: parsed.privacyConsent ?? null,
+    },
     documents,
     email_verified_at: confirmed ? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),

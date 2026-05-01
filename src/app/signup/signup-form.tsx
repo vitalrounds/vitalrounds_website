@@ -128,7 +128,18 @@ export default function ApplicantSignupForm() {
     setSubmitting(true);
     setError(null);
     const fd = new FormData();
-    fd.append("json", JSON.stringify({ survey, details }));
+    fd.append(
+      "json",
+      JSON.stringify({
+        survey,
+        details,
+        privacyConsent: {
+          accepted: privacyAccepted,
+          acceptedAt: new Date().toISOString(),
+          version: "2026-05-01",
+        },
+      }),
+    );
     fd.append("password", password);
     Object.entries(files).forEach(([key, file]) => {
       if (file) fd.append(key, file);
@@ -292,10 +303,63 @@ export default function ApplicantSignupForm() {
               <Check ok={passwordChecks.special} text="Special character" />
             </ul>
           </div>
-          <label className="flex cursor-pointer gap-3 rounded-2xl border border-[#dfece0] bg-white p-4 text-sm">
-            <input type="checkbox" checked={privacyAccepted} onChange={(e) => setPrivacyAccepted(e.target.checked)} className="mt-1 accent-[#759d7b]" />
-            <span>I confirm the information provided is accurate and agree to VitalRounds collecting, storing, and reviewing my information for applicant account and observership coordination purposes.</span>
-          </label>
+          <section className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-[#6e706e]">
+              Privacy consent
+            </h3>
+            <div className="rounded-2xl border border-[#dfece0] bg-[#faf8f5] p-4">
+              <label className="flex cursor-pointer gap-3 rounded-xl border border-[#d5dfd6] bg-white p-4 text-sm">
+                <input
+                  type="checkbox"
+                  checked={privacyAccepted}
+                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                  className="mt-1 accent-[#759d7b]"
+                />
+                <span>
+                  I have read and agree to the privacy consent and understand how my information may
+                  be collected, stored, reviewed, and used by VitalRounds.
+                  <span className="text-red-600"> *</span>
+                </span>
+              </label>
+              <details className="mt-3 rounded-xl border border-[#d5dfd6] bg-white px-4 py-3">
+                <summary className="cursor-pointer text-sm font-semibold text-[#354a38] underline-offset-4 hover:underline">
+                  View privacy consent terms
+                </summary>
+                <div className="mt-3 space-y-3 text-sm leading-7 text-[#354a38]">
+                  <p>
+                    By creating an applicant account, you consent to VitalRounds collecting,
+                    storing, and reviewing the personal information, professional details, and
+                    documents you provide for applicant account creation, wait list management,
+                    application assessment, communication, and potential observership placement
+                    coordination.
+                  </p>
+                  <p>
+                    Some information may be sensitive, including identity documents, visa details,
+                    registration information, certificates, and medical education records.
+                    VitalRounds will take reasonable steps to protect this information using secure
+                    systems and restricted administrative access, but no online system can be
+                    guaranteed to be completely risk-free.
+                  </p>
+                  <p>
+                    Uploading a driving licence or passport is optional. If you choose to upload
+                    one, you confirm that you understand this is your choice and that it may be used
+                    only for identity review and application administration.
+                  </p>
+                  <p>
+                    You confirm that the information you provide is true and accurate to the best of
+                    your knowledge, and you understand that creating an account does not guarantee
+                    acceptance, placement, employment, registration, visa outcome, or any clinical
+                    appointment.
+                  </p>
+                  <p>
+                    You may contact VitalRounds at admin@vitalrounds.com.au to ask about your
+                    submitted information or request deletion, subject to legal, operational, and
+                    record-keeping requirements.
+                  </p>
+                </div>
+              </details>
+            </div>
+          </section>
         </Panel>
       )}
 
