@@ -144,6 +144,22 @@ export function ProfilePanel({
     setMessage("Profile photo updated.");
   }
 
+  async function removeAvatar() {
+    setAvatarUploading(true);
+    setError(null);
+    setMessage(null);
+    const res = await fetch("/api/applicant-profile/documents", { method: "DELETE" });
+    const body = await res.json().catch(() => ({}));
+    setAvatarUploading(false);
+    if (!res.ok) {
+      setError(body.error ?? "Could not remove profile photo.");
+      return;
+    }
+    setDocuments(body.documents ?? {});
+    setAvatarUrl(null);
+    setMessage("Profile photo removed.");
+  }
+
   async function uploadDocument(formData: FormData) {
     setError(null);
     setMessage(null);
@@ -205,6 +221,16 @@ export function ProfilePanel({
             }}
           />
           <p className="mt-3 text-xs leading-6 text-[#86aa8d]">JPG, PNG, or WebP. Max {MAX_AVATAR_MB} MB.</p>
+          {avatar?.path && !selectedAvatarUrl ? (
+            <button
+              type="button"
+              onClick={removeAvatar}
+              disabled={avatarUploading}
+              className="mt-3 rounded-full border border-[#354a38] px-4 py-2 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#28452f] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {avatarUploading ? "Removing..." : "Remove photo"}
+            </button>
+          ) : null}
           {selectedAvatarUrl ? (
             <div className="mt-5 rounded-2xl border border-[#354a38] bg-[#243329] p-4 text-left">
               <p className="text-sm font-semibold text-white">Position your photo</p>

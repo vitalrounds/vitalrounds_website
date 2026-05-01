@@ -134,6 +134,15 @@ export async function POST(req: Request) {
         ],
       };
 
+  const previousAvatar =
+    isAvatar &&
+    currentDocuments.avatar &&
+    typeof currentDocuments.avatar === "object" &&
+    "path" in currentDocuments.avatar &&
+    typeof currentDocuments.avatar.path === "string"
+      ? currentDocuments.avatar.path
+      : null;
+
   const { error: updateError } = await admin
     .from("applicant_profiles")
     .update({ documents: nextDocuments, updated_at: new Date().toISOString() })
@@ -143,5 +152,56 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
+  if (previousAvatar) {
+    await admin.storage.from(APPLICANT_DOCUMENTS_BUCKET).remove([previousAvatar]);
+  }
+
   return NextResponse.json({ document: uploaded, documents: nextDocuments });
+}
+
+export async function DELETE() {
+  const user = await requireApplicant();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const admin = createServiceRoleClient();
+  const { data: profile, error: profileError } = await admin
+    .from("applicant_profiles")
+    .select("documents")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  }
+
+  const currentDocuments =
+    profile?.documents && typeof profile.documents === "object"
+      ? (profile.documents as Record<string, unknown>)
+      : {};
+  const avatarPath =
+    currentDocuments.avatar &&
+    typeof currentDocuments.avatar === "object" &&
+    "path" in currentDocuments.avatar &&
+    typeof currentDocuments.avatar.path === "string"
+      ? currentDocuments.avatar.path
+      : null;
+  const nextDocuments = { ...currentDocuments };
+  delete nextDocuments.avatar;
+
+  const { error: updateError } = await admin
+    .from("applicant_profiles")
+    .update({ documents: nextDocuments, updated_at: new Date().toISOString() })
+    .eq("user_id", user.id);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
+  }
+
+  if (avatarPath) {
+    await admin.storage.from(APPLICANT_DOCUMENTS_BUCKET).remove([avatarPath]);
+  }
+
+  return NextResponse.json({ documents: nextDocuments });
 }
