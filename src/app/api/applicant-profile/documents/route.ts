@@ -53,6 +53,7 @@ export async function POST(req: Request) {
   const form = await req.formData();
   const kind = String(form.get("kind") ?? "");
   const label = String(form.get("label") ?? "").trim();
+  const avatarPosition = String(form.get("avatarPosition") ?? "50% 50%");
   const file = form.get("file");
 
   if (!(file instanceof File) || file.size <= 0) {
@@ -117,6 +118,7 @@ export async function POST(req: Request) {
     size: file.size,
     type: file.type || null,
     bucket: APPLICANT_DOCUMENTS_BUCKET,
+    ...(isAvatar ? { avatarPosition } : {}),
     uploadedAt: new Date().toISOString(),
   };
 

@@ -13,12 +13,24 @@ type DocumentRecord = {
   size?: number;
   type?: string | null;
   uploadedAt?: string;
+  avatarPosition?: string;
 };
 
 const VISA_OPTIONS = ["Student", "Tourist", "PR", "Citizen", "Other"] as const;
 const ENGLISH_TESTS = ["OET", "IELTS", "PTE"] as const;
 const MAX_AVATAR_MB = 2;
 const MAX_DOCUMENT_MB = 10;
+const AVATAR_POSITIONS = [
+  { label: "Top left", value: "25% 25%" },
+  { label: "Top", value: "50% 25%" },
+  { label: "Top right", value: "75% 25%" },
+  { label: "Left", value: "25% 50%" },
+  { label: "Center", value: "50% 50%" },
+  { label: "Right", value: "75% 50%" },
+  { label: "Bottom left", value: "25% 75%" },
+  { label: "Bottom", value: "50% 75%" },
+  { label: "Bottom right", value: "75% 75%" },
+] as const;
 
 const documentLabels: Record<string, string> = {
   cv: "Curriculum Vitae (CV)",
@@ -50,6 +62,10 @@ export function ProfilePanel({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+  const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string | null>(null);
+  const [avatarPosition, setAvatarPosition] = useState("50% 50%");
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const avatar = documents.avatar as DocumentRecord | undefined;
@@ -59,6 +75,16 @@ export function ProfilePanel({
       if (url) setAvatarUrl(url);
     });
   }, [avatar?.path]);
+
+  useEffect(() => {
+    setAvatarPosition(avatar?.avatarPosition ?? "50% 50%");
+  }, [avatar?.avatarPosition]);
+
+  useEffect(() => {
+    return () => {
+      if (selectedAvatarUrl) URL.revokeObjectURL(selectedAvatarUrl);
+    };
+  }, [selectedAvatarUrl]);
 
   const initials = useMemo(() => getInitials(details.preferredName || details.fullLegalName), [details]);
 
@@ -81,7 +107,7 @@ export function ProfilePanel({
     setMessage("Personal details updated.");
   }
 
-  async function uploadAvatar(file: File | null) {
+  function startAvatarSelection(file: File | null) {
     if (!file) return;
     setError(null);
     setMessage(null);
@@ -89,16 +115,32 @@ export function ProfilePanel({
       setError(`Profile photo must be ${MAX_AVATAR_MB} MB or smaller.`);
       return;
     }
+    if (selectedAvatarUrl) URL.revokeObjectURL(selectedAvatarUrl);
+    setSelectedAvatarFile(file);
+    setSelectedAvatarUrl(URL.createObjectURL(file));
+    setAvatarPosition(avatar?.avatarPosition ?? "50% 50%");
+  }
+
+  async function uploadAvatar() {
+    if (!selectedAvatarFile) return;
+    setAvatarUploading(true);
+    setError(null);
+    setMessage(null);
     const fd = new FormData();
     fd.append("kind", "avatar");
-    fd.append("file", file);
+    fd.append("avatarPosition", avatarPosition);
+    fd.append("file", selectedAvatarFile);
     const res = await fetch("/api/applicant-profile/documents", { method: "POST", body: fd });
     const body = await res.json().catch(() => ({}));
+    setAvatarUploading(false);
     if (!res.ok) {
       setError(body.error ?? "Could not upload profile photo.");
       return;
     }
     setDocuments(body.documents ?? documents);
+    setSelectedAvatarFile(null);
+    if (selectedAvatarUrl) URL.revokeObjectURL(selectedAvatarUrl);
+    setSelectedAvatarUrl(null);
     setMessage("Profile photo updated.");
   }
 
@@ -133,13 +175,23 @@ export function ProfilePanel({
             <span className="relative mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-[#759d7b] bg-[#28452f] text-3xl font-semibold text-white transition group-hover:scale-105 group-hover:border-[#9bd4a4]">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarUrl} alt="Profile avatar" className="h-full w-full object-cover" />
+                <img
+                  src={avatarUrl}
+                  alt="Profile avatar"
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: avatar?.avatarPosition ?? "50% 50%" }}
+                />
               ) : (
                 initials
               )}
+              {avatarUploading ? (
+                <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-xs font-semibold text-white">
+                  Uploading...
+                </span>
+              ) : null}
             </span>
             <span className="mt-3 block text-xs font-semibold text-[#9bd4a4] group-hover:underline">
-              Change photo
+              {avatarUploading ? "Uploading photo..." : "Change photo"}
             </span>
           </button>
           <input
@@ -147,9 +199,67 @@ export function ProfilePanel({
             type="file"
             accept="image/jpeg,image/png,image/webp"
             className="hidden"
-            onChange={(event) => uploadAvatar(event.target.files?.[0] ?? null)}
+            onChange={(event) => {
+              startAvatarSelection(event.target.files?.[0] ?? null);
+              event.currentTarget.value = "";
+            }}
           />
           <p className="mt-3 text-xs leading-6 text-[#86aa8d]">JPG, PNG, or WebP. Max {MAX_AVATAR_MB} MB.</p>
+          {selectedAvatarUrl ? (
+            <div className="mt-5 rounded-2xl border border-[#354a38] bg-[#243329] p-4 text-left">
+              <p className="text-sm font-semibold text-white">Position your photo</p>
+              <p className="mt-1 text-xs leading-5 text-[#86aa8d]">
+                Choose which part of the photo should sit inside the avatar circle.
+              </p>
+              <div className="mx-auto mt-4 flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border border-[#759d7b] bg-[#1a2b1e]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={selectedAvatarUrl}
+                  alt="Selected avatar preview"
+                  className="h-full w-full object-cover"
+                  style={{ objectPosition: avatarPosition }}
+                />
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {AVATAR_POSITIONS.map((position) => (
+                  <button
+                    key={position.value}
+                    type="button"
+                    onClick={() => setAvatarPosition(position.value)}
+                    className={
+                      avatarPosition === position.value
+                        ? "rounded-xl bg-[#759d7b] px-2 py-2 text-xs font-semibold text-white"
+                        : "rounded-xl border border-[#354a38] px-2 py-2 text-xs font-semibold text-[#cbecd0] hover:bg-[#28452f]"
+                    }
+                  >
+                    {position.label}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-4 flex gap-2">
+                <button
+                  type="button"
+                  onClick={uploadAvatar}
+                  disabled={avatarUploading}
+                  className="flex-1 rounded-full bg-[#759d7b] px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+                >
+                  {avatarUploading ? "Uploading..." : "Save photo"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedAvatarUrl) URL.revokeObjectURL(selectedAvatarUrl);
+                    setSelectedAvatarFile(null);
+                    setSelectedAvatarUrl(null);
+                  }}
+                  disabled={avatarUploading}
+                  className="rounded-full border border-[#354a38] px-4 py-2 text-xs font-semibold text-[#cbecd0] disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : null}
         </aside>
 
         <div className="rounded-2xl border border-[#223a29] bg-[#1a2b1e] p-5">
