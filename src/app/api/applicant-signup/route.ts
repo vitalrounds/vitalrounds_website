@@ -163,8 +163,18 @@ export async function POST(req: Request) {
   });
 
   if (profileError) {
+    console.error("applicant_profile_save_failed", profileError);
+    const missingTable =
+      profileError.message?.toLowerCase().includes("applicant_profiles") ||
+      profileError.message?.toLowerCase().includes("schema cache") ||
+      profileError.message?.toLowerCase().includes("relation");
+
     return NextResponse.json(
-      { error: "Account was created, but applicant profile could not be saved. Contact admin." },
+      {
+        error: missingTable
+          ? "Account was created, but applicant profile setup is incomplete. Admin needs to run sql/applicant_portal.sql in Supabase."
+          : `Account was created, but applicant profile could not be saved. Admin detail: ${profileError.message}`,
+      },
       { status: 500 },
     );
   }
