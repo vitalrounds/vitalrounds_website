@@ -226,7 +226,7 @@ export function ProfilePanel({
               type="button"
               onClick={removeAvatar}
               disabled={avatarUploading}
-              className="mt-3 rounded-full border border-[#354a38] px-4 py-2 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#28452f] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-3 rounded-full border border-[#354a38] px-4 py-2 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#425f48] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {avatarUploading ? "Removing..." : "Remove photo"}
             </button>
@@ -255,7 +255,7 @@ export function ProfilePanel({
                     className={
                       avatarPosition === position.value
                         ? "rounded-xl bg-[#759d7b] px-2 py-2 text-xs font-semibold text-white"
-                        : "rounded-xl border border-[#354a38] px-2 py-2 text-xs font-semibold text-[#cbecd0] hover:bg-[#28452f]"
+                        : "rounded-xl border border-[#354a38] px-2 py-2 text-xs font-semibold text-[#cbecd0] hover:bg-[#425f48]"
                     }
                   >
                     {position.label}
@@ -306,7 +306,7 @@ export function ProfilePanel({
                 className={
                   activeTab === id
                     ? "rounded-full bg-[#759d7b] px-4 py-2 text-sm font-semibold text-white"
-                    : "rounded-full border border-[#354a38] px-4 py-2 text-sm font-semibold text-[#cbecd0] hover:bg-[#28452f]"
+                    : "rounded-full border border-[#354a38] px-4 py-2 text-sm font-semibold text-[#cbecd0] hover:bg-[#425f48]"
                 }
               >
                 {label}
@@ -385,7 +385,7 @@ function PersonalDetails({
                 className={
                   selected
                     ? "rounded-full bg-[#759d7b] px-3 py-2 text-xs font-semibold text-white"
-                    : "rounded-full border border-[#354a38] px-3 py-2 text-xs font-semibold text-[#cbecd0] hover:bg-[#28452f]"
+                    : "rounded-full border border-[#354a38] px-3 py-2 text-xs font-semibold text-[#cbecd0] hover:bg-[#425f48]"
                 }
               >
                 {option}

@@ -348,7 +348,7 @@ const doctorThemeCss = `
     --doctor-text: #ffffff;
     --doctor-muted: #a6ccac;
     --doctor-soft: #cbecd0;
-    --doctor-hover: #354a38;
+    --doctor-hover: #425f48;
     --doctor-active: #354a38;
   }
   .doctor-shell[data-doctor-theme="light"] {
