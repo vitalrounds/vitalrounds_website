@@ -7,6 +7,8 @@ import { useEffect, useState, type ReactNode } from "react";
 
 type Theme = "dark" | "light";
 
+const IDLE_SIGN_OUT_MS = 10 * 60 * 1000;
+
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
   { href: "/dashboard/programs", label: "Browse Programs", icon: ProgramsIcon },
@@ -31,6 +33,31 @@ export function DoctorPortalShell({
     if (savedTheme === "dark" || savedTheme === "light") setTheme(savedTheme);
     const savedSidebar = window.localStorage.getItem("vitalrounds-doctor-sidebar");
     if (savedSidebar === "collapsed") setCollapsed(true);
+  }, []);
+
+  useEffect(() => {
+    let timeoutId = window.setTimeout(() => {
+      window.location.assign("/auth/sign-out");
+    }, IDLE_SIGN_OUT_MS);
+
+    const resetIdleTimer = () => {
+      window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        window.location.assign("/auth/sign-out");
+      }, IDLE_SIGN_OUT_MS);
+    };
+
+    const activityEvents = ["click", "keydown", "mousemove", "scroll", "touchstart"] as const;
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(eventName, resetIdleTimer, { passive: true });
+    });
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      activityEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, resetIdleTimer);
+      });
+    };
   }, []);
 
   function toggleSidebar() {

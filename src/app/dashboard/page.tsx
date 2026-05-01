@@ -8,7 +8,7 @@ export default function DoctorDashboardPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-4xl font-semibold text-white">Doctor Dashboard</h1>
+        <h1 className="text-4xl font-semibold text-white">Welcome to VitalRounds !</h1>
         <p className="mt-2 text-sm text-[#86aa8d]">Your portal overview and available pathways.</p>
       </header>
       <div className="grid gap-4 md:grid-cols-4">
