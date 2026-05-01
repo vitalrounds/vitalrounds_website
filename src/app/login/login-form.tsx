@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import {
   getPostLoginPath,
@@ -149,6 +150,12 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       >
         {loading ? "Signing in…" : "Sign in"}
       </button>
+      <div className="rounded-2xl border border-[#dfece0] bg-[#f5fbf6] px-4 py-3 text-center text-sm text-[#5f7362]">
+        New applicant?{" "}
+        <Link href="/signup" className="font-semibold text-[#354a38] underline-offset-4 hover:underline">
+          Create an applicant account
+        </Link>
+      </div>
     </form>
   );
 }

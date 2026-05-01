@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { COUNTRY_OPTIONS } from "@/lib/waitlist/countries";
 import { SPECIALTY_OPTIONS, SURVEY_QUESTIONS, type SurveyQuestion } from "@/lib/waitlist/questions";
 
@@ -52,6 +52,7 @@ const VISA_OPTIONS = ["Student", "Tourist", "PR", "Citizen", "Other"] as const;
 const ENGLISH_TESTS = ["OET", "IELTS", "PTE"] as const;
 
 export default function ApplicantSignupForm() {
+  const formTopRef = useRef<HTMLDivElement | null>(null);
   const [step, setStep] = useState(0);
   const [survey, setSurvey] = useState<Record<string, string | string[]>>({});
   const [details, setDetails] = useState<Details>(emptyDetails);
@@ -74,6 +75,13 @@ export default function ApplicantSignupForm() {
   );
   const passwordScore = Object.values(passwordChecks).filter(Boolean).length;
   const passwordStrong = passwordScore === 5;
+
+  function goToStep(nextStep: number) {
+    setStep(nextStep);
+    requestAnimationFrame(() => {
+      formTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   function setDetail<K extends keyof Details>(key: K, value: Details[K]) {
     setDetails((prev) => ({ ...prev, [key]: value }));
@@ -149,7 +157,7 @@ export default function ApplicantSignupForm() {
 
   return (
     <div className="space-y-6">
-      <header className="text-center">
+      <header ref={formTopRef} className="scroll-mt-6 text-center">
         <h1 className="text-4xl font-semibold">Create Applicant Account</h1>
         <p className="mt-2 text-sm text-[#5f7362]">Questionnaire, details, documents, and password setup.</p>
       </header>
@@ -159,7 +167,7 @@ export default function ApplicantSignupForm() {
           <button
             key={label}
             type="button"
-            onClick={() => setStep(idx)}
+            onClick={() => goToStep(idx)}
             className={
               step === idx
                 ? "rounded-full bg-[#759d7b] px-4 py-2 text-white"
@@ -294,11 +302,11 @@ export default function ApplicantSignupForm() {
       {error && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
 
       <div className="flex flex-wrap justify-between gap-3">
-        <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} className="rounded-full border border-[#759d7b] px-6 py-2.5 text-sm font-semibold">
+        <button type="button" onClick={() => goToStep(Math.max(0, step - 1))} className="rounded-full border border-[#759d7b] px-6 py-2.5 text-sm font-semibold">
           Back
         </button>
         {step < 3 ? (
-          <button type="button" onClick={() => setStep((s) => Math.min(3, s + 1))} className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white">
+          <button type="button" onClick={() => goToStep(Math.min(3, step + 1))} className="rounded-full bg-[#759d7b] px-6 py-2.5 text-sm font-semibold text-white">
             Continue
           </button>
         ) : (
