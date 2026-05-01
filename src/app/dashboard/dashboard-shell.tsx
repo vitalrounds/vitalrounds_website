@@ -24,6 +24,7 @@ export function DoctorPortalShell({
   const pathname = usePathname();
   const [theme, setTheme] = useState<Theme>("dark");
   const [collapsed, setCollapsed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("vitalrounds-doctor-theme");
@@ -31,11 +32,6 @@ export function DoctorPortalShell({
     const savedSidebar = window.localStorage.getItem("vitalrounds-doctor-sidebar");
     if (savedSidebar === "collapsed") setCollapsed(true);
   }, []);
-
-  function updateTheme(next: Theme) {
-    setTheme(next);
-    window.localStorage.setItem("vitalrounds-doctor-theme", next);
-  }
 
   function toggleSidebar() {
     setCollapsed((current) => {
@@ -81,26 +77,34 @@ export function DoctorPortalShell({
             <span className="hidden text-sm font-semibold text-[var(--doctor-muted)] sm:inline">
               Hi {userName}
             </span>
-            <details className="relative">
-              <summary className="list-none">
-                <button
-                  type="button"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#759d7b] text-xs font-bold text-white"
-                  aria-label="Open account menu"
-                >
-                  {initials}
-                </button>
-              </summary>
-              <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-2xl border border-[var(--doctor-border)] bg-[var(--doctor-surface)] p-2 shadow-xl">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((current) => !current)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#759d7b] text-xs font-bold text-white shadow-sm ring-2 ring-transparent transition hover:scale-105 hover:bg-[#5f8f68] hover:ring-[var(--doctor-border)] focus:outline-none focus:ring-2 focus:ring-[#9bd4a4]"
+                aria-label="Open account menu"
+                aria-expanded={menuOpen}
+              >
+                {initials}
+              </button>
+              <div
+                className={
+                  menuOpen
+                    ? "absolute right-0 z-20 mt-2 w-44 translate-y-0 overflow-hidden rounded-2xl border border-[var(--doctor-border)] bg-[var(--doctor-surface)] p-2 opacity-100 shadow-xl transition duration-200 ease-out"
+                    : "pointer-events-none absolute right-0 z-20 mt-2 w-44 -translate-y-2 overflow-hidden rounded-2xl border border-[var(--doctor-border)] bg-[var(--doctor-surface)] p-2 opacity-0 shadow-xl transition duration-200 ease-out"
+                }
+              >
                 <Link
                   href="/dashboard/profile"
                   className="block rounded-xl px-3 py-2 text-sm font-semibold text-[var(--doctor-soft)] hover:bg-[var(--doctor-hover)]"
+                  onClick={() => setMenuOpen(false)}
                 >
                   Account
                 </Link>
                 <Link
                   href="/dashboard/payments"
                   className="block rounded-xl px-3 py-2 text-sm font-semibold text-[var(--doctor-soft)] hover:bg-[var(--doctor-hover)]"
+                  onClick={() => setMenuOpen(false)}
                 >
                   Billing
                 </Link>
@@ -111,7 +115,7 @@ export function DoctorPortalShell({
                   Sign out
                 </Link>
               </div>
-            </details>
+            </div>
           </div>
         </div>
       </header>
@@ -205,8 +209,8 @@ export function DoctorThemeSettings() {
           onClick={() => update(item)}
           className={
             theme === item
-              ? "rounded-2xl border border-[#759d7b] bg-[#354a38] p-5 text-left"
-              : "rounded-2xl border border-[#354a38] bg-[#2c3d2f] p-5 text-left hover:border-[#759d7b]"
+              ? "rounded-2xl border border-[#759d7b] bg-[#28452f] p-5 text-left shadow-sm"
+              : "rounded-2xl border border-[#223a29] bg-[#1a2b1e] p-5 text-left transition hover:border-[#759d7b] hover:bg-[#28452f]"
           }
         >
           <h2 className="text-lg font-semibold text-white">
