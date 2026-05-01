@@ -159,6 +159,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     kind: "single",
     options: [
       "Google search",
+      "AI LLM (e.g. Chat-GPT)",
       "Facebook group",
       "LinkedIn",
       "Word of mouth / referral",
