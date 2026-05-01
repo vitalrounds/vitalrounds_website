@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { DoctorPortalShell } from "./dashboard-shell";
 
 export default async function DoctorDashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient();
@@ -13,13 +13,15 @@ export default async function DoctorDashboardLayout({ children }: { children: Re
   if (user.user_metadata?.role !== "applicant") redirect("/login?error=wrong_role");
 
   let status = "pending_email_verification";
+  let fullName = user.user_metadata?.full_name as string | undefined;
   try {
     const admin = createServiceRoleClient();
     const { data } = await admin
       .from("applicant_profiles")
-      .select("status")
+      .select("status, full_name")
       .eq("user_id", user.id)
       .maybeSingle();
+    fullName = data?.full_name ?? fullName;
     const { data: authUser } = await admin.auth.admin.getUserById(user.id);
     const verified = Boolean(authUser.user?.email_confirmed_at ?? user.email_confirmed_at);
     if (verified && data?.status !== "active") {
@@ -48,35 +50,13 @@ export default async function DoctorDashboardLayout({ children }: { children: Re
             Please open the verification email sent to {user.email} and click the link to activate
             your doctor portal. Once verified, your dashboard pages will unlock automatically.
           </p>
-          <Link href="/auth/sign-out" className="mt-6 inline-flex rounded-full border border-[#5f7362] px-5 py-2 text-sm font-semibold">
+          <a href="/auth/sign-out" className="mt-6 inline-flex rounded-full border border-[#5f7362] px-5 py-2 text-sm font-semibold">
             Sign out
-          </Link>
+          </a>
         </section>
       </main>
     );
   }
 
-  const nav = [
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/dashboard/programs", label: "Browse Programs" },
-    { href: "/dashboard/enrollments", label: "My Enrollments" },
-    { href: "/dashboard/payments", label: "Payments" },
-    { href: "/dashboard/profile", label: "Profile" },
-  ];
-
-  return (
-    <div className="min-h-screen bg-[#0f1f14] text-[#cbecd0]">
-      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-[#223a29] bg-[#132318] p-5 md:block">
-        <div className="text-lg font-semibold text-white">VitalRounds — Doctor Portal</div>
-        <nav className="mt-10 space-y-2">
-          {nav.map((item) => (
-            <Link key={item.href} href={item.href} className="block rounded-lg px-3 py-2 text-sm font-semibold text-[#a6ccac] hover:bg-[#28452f] hover:text-white">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </aside>
-      <main className="mx-auto max-w-6xl px-6 py-8 md:ml-64">{children}</main>
-    </div>
-  );
+  return <DoctorPortalShell userName={fullName ?? user.email ?? "Doctor"}>{children}</DoctorPortalShell>;
 }

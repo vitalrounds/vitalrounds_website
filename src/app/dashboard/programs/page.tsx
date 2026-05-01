@@ -16,8 +16,11 @@ export default function BrowseProgramsPage() {
           <article key={card} className="rounded-2xl border border-[#223a29] bg-[#1a2b1e] p-5">
             <p className="text-xs font-semibold text-[#6bbf73]">{card}</p>
             <h2 className="mt-2 font-semibold text-white">{card} Observership</h2>
-            <p className="mt-1 text-sm text-[#86aa8d]">Program details and availability will appear here.</p>
-            <button className="mt-4 w-full rounded-full bg-[#4d8b57] px-4 py-2 text-sm font-semibold text-white">
+            <p className="mt-1 text-sm text-[#86aa8d]">Program details and availability are coming soon.</p>
+            <span className="mt-4 inline-flex rounded-full border border-[#4d8b57] px-3 py-1 text-xs font-semibold text-[#9bd4a4]">
+              Coming soon
+            </span>
+            <button disabled className="mt-4 w-full cursor-not-allowed rounded-full bg-[#4d8b57]/50 px-4 py-2 text-sm font-semibold text-white/70">
               Apply Now
             </button>
           </article>
