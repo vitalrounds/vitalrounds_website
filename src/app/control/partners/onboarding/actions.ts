@@ -17,6 +17,13 @@ function stringField(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
 }
 
+function stringList(formData: FormData, key: string) {
+  return formData
+    .getAll(key)
+    .map((value) => String(value).trim())
+    .filter(Boolean);
+}
+
 function sanitizeFileName(name: string) {
   return name
     .replace(/\s+/g, "-")
@@ -68,7 +75,7 @@ export async function createPartnerAccount(
   const contactPhone = stringField(formData, "contactPhone");
   const physicalAddress = stringField(formData, "physicalAddress");
   const website = stringField(formData, "website");
-  const departments = stringField(formData, "departments");
+  const departments = stringList(formData, "departments");
   const adminNotes = stringField(formData, "adminNotes");
 
   if (!organisationLegalName || !email || !password || !primaryContactName) {
@@ -161,7 +168,7 @@ export async function createPartnerAccount(
     contact_phone: contactPhone || null,
     physical_address: physicalAddress || null,
     website: website || null,
-    departments: departments || null,
+    departments: departments.length > 0 ? departments.join("\n") : null,
     admin_notes: adminNotes || null,
     avatar,
     status: "active",

@@ -12,12 +12,14 @@ export function PartnerOnboardingForm() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const [password, setPassword] = useState(() => generateTemporaryPassword());
   const [showPassword, setShowPassword] = useState(true);
+  const [departments, setDepartments] = useState([""]);
   const [state, formAction, pending] = useActionState(async (prev: CreatePartnerState, fd: FormData) => {
     const result = await createPartnerAccount(prev, fd);
     if (result.ok) {
       formRef.current?.reset();
       setPassword(generateTemporaryPassword());
       setShowPassword(true);
+      setDepartments([""]);
     }
     return result;
   }, initialState);
@@ -39,6 +41,7 @@ export function PartnerOnboardingForm() {
       onReset={() => {
         setPassword(generateTemporaryPassword());
         setShowPassword(true);
+        setDepartments([""]);
       }}
       className="partner-onboarding-field space-y-6"
     >
@@ -139,11 +142,46 @@ export function PartnerOnboardingForm() {
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <Field name="primaryContactName" label="Primary contact name" required />
           <Field name="primaryContactRole" label="Primary contact role" />
-          <TextArea
-            name="departments"
-            label="Departments / specialties available"
-            placeholder="Emergency, general medicine, cardiology, surgery..."
-          />
+          <div className="md:col-span-2">
+            <p className="text-sm font-semibold text-[#cbecd0]">Departments participating</p>
+            <div className="mt-2 space-y-2">
+              {departments.map((value, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    name="departments"
+                    value={value}
+                    onChange={(event) =>
+                      setDepartments((current) =>
+                        current.map((item, itemIndex) =>
+                          itemIndex === index ? event.target.value : item,
+                        ),
+                      )
+                    }
+                    placeholder="Emergency, general medicine, cardiology..."
+                    className={inputClassName}
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDepartments((current) =>
+                        current.length === 1 ? [""] : current.filter((_, itemIndex) => itemIndex !== index),
+                      )
+                    }
+                    className="mt-1 rounded-full border border-[#5f7362] px-4 py-2 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#354a38]"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setDepartments((current) => [...current, ""])}
+              className="mt-3 rounded-full bg-[#759d7b] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#5f7362]"
+            >
+              Add department
+            </button>
+          </div>
           <TextArea
             name="adminNotes"
             label="Internal admin notes"
