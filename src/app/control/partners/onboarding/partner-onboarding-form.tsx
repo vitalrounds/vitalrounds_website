@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useMemo, useRef, useState } from "react";
 import { createPartnerAccount, type CreatePartnerState } from "./actions";
 
 const initialState: CreatePartnerState = {
@@ -10,14 +10,34 @@ const initialState: CreatePartnerState = {
 
 export function PartnerOnboardingForm() {
   const formRef = useRef<HTMLFormElement | null>(null);
+  const [password, setPassword] = useState("");
   const [state, formAction, pending] = useActionState(async (prev: CreatePartnerState, fd: FormData) => {
     const result = await createPartnerAccount(prev, fd);
-    if (result.ok) formRef.current?.reset();
+    if (result.ok) {
+      formRef.current?.reset();
+      setPassword("");
+    }
     return result;
   }, initialState);
+  const passwordChecks = useMemo(
+    () => ({
+      length: password.length >= 12,
+      lower: /[a-z]/.test(password),
+      upper: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      special: /[^A-Za-z0-9]/.test(password),
+    }),
+    [password],
+  );
 
   return (
-    <form ref={formRef} action={formAction} className="space-y-6">
+    <form
+      ref={formRef}
+      action={formAction}
+      onReset={() => setPassword("")}
+      className="partner-onboarding-field space-y-6"
+    >
+      <style>{autofillCss}</style>
       {state.message ? (
         <p
           className={
@@ -43,13 +63,25 @@ export function PartnerOnboardingForm() {
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <Field name="email" label="Partner login email" type="email" required />
-          <Field
-            name="password"
-            label="Temporary password"
-            type="password"
-            required
-            hint="Minimum 12 characters with upper/lowercase, number, and special character."
-          />
+          <label className="block text-sm font-semibold text-[#cbecd0]">
+            Temporary password <span className="text-red-300"> *</span>
+            <input
+              name="password"
+              type="text"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+              className={inputClassName}
+            />
+            <ul className="mt-2 grid gap-1 rounded-xl border border-[#354a38] bg-[#243329] p-3 text-xs leading-5 text-[#a6ccac] sm:grid-cols-2">
+              <Check ok={passwordChecks.length} text="At least 12 characters" />
+              <Check ok={passwordChecks.upper} text="Uppercase letter" />
+              <Check ok={passwordChecks.lower} text="Lowercase letter" />
+              <Check ok={passwordChecks.number} text="Number" />
+              <Check ok={passwordChecks.special} text="Special character" />
+            </ul>
+          </label>
         </div>
       </section>
 
@@ -153,7 +185,8 @@ function Field({
         name={name}
         type={type}
         required={required}
-        className="mt-1 w-full rounded-xl border border-[#354a38] bg-[#243329] px-3 py-2 text-sm text-white outline-none focus:border-[#759d7b]"
+        autoComplete="off"
+        className={inputClassName}
       />
       {hint ? <span className="mt-1 block text-xs leading-5 text-[#a6ccac]">{hint}</span> : null}
     </label>
@@ -174,7 +207,7 @@ function Select({
       {label}
       <select
         name={name}
-        className="mt-1 w-full rounded-xl border border-[#354a38] bg-[#243329] px-3 py-2 text-sm text-white outline-none focus:border-[#759d7b]"
+        className={inputClassName}
       >
         <option value="">Select...</option>
         {options.map((option) => (
@@ -203,8 +236,31 @@ function TextArea({
         name={name}
         rows={4}
         placeholder={placeholder}
-        className="mt-1 w-full rounded-xl border border-[#354a38] bg-[#243329] px-3 py-2 text-sm text-white outline-none focus:border-[#759d7b]"
+        className={inputClassName}
       />
     </label>
   );
 }
+
+const inputClassName =
+  "mt-1 w-full rounded-xl border border-[#354a38] bg-[#243329] px-3 py-2 text-sm text-white caret-white outline-none focus:border-[#759d7b]";
+
+function Check({ ok, text }: { ok: boolean; text: string }) {
+  return <li className={ok ? "text-[#9bd4a4]" : "text-[#a6ccac]"}>{ok ? "OK" : "-"} {text}</li>;
+}
+
+const autofillCss = `
+  .partner-onboarding-field input:-webkit-autofill,
+  .partner-onboarding-field input:-webkit-autofill:hover,
+  .partner-onboarding-field input:-webkit-autofill:focus,
+  .partner-onboarding-field textarea:-webkit-autofill,
+  .partner-onboarding-field textarea:-webkit-autofill:hover,
+  .partner-onboarding-field textarea:-webkit-autofill:focus,
+  .partner-onboarding-field select:-webkit-autofill,
+  .partner-onboarding-field select:-webkit-autofill:hover,
+  .partner-onboarding-field select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff;
+    box-shadow: 0 0 0 1000px #243329 inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+`;
