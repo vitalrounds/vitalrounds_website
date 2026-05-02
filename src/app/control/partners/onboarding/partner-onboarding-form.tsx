@@ -10,12 +10,14 @@ const initialState: CreatePartnerState = {
 
 export function PartnerOnboardingForm() {
   const formRef = useRef<HTMLFormElement | null>(null);
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(() => generateTemporaryPassword());
+  const [showPassword, setShowPassword] = useState(true);
   const [state, formAction, pending] = useActionState(async (prev: CreatePartnerState, fd: FormData) => {
     const result = await createPartnerAccount(prev, fd);
     if (result.ok) {
       formRef.current?.reset();
-      setPassword("");
+      setPassword(generateTemporaryPassword());
+      setShowPassword(true);
     }
     return result;
   }, initialState);
@@ -34,7 +36,10 @@ export function PartnerOnboardingForm() {
     <form
       ref={formRef}
       action={formAction}
-      onReset={() => setPassword("")}
+      onReset={() => {
+        setPassword(generateTemporaryPassword());
+        setShowPassword(true);
+      }}
       className="partner-onboarding-field space-y-6"
     >
       <style>{autofillCss}</style>
@@ -67,13 +72,34 @@ export function PartnerOnboardingForm() {
             Temporary password <span className="text-red-300"> *</span>
             <input
               name="password"
-              type="text"
+              type={showPassword ? "text" : "password"}
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="new-password"
               className={inputClassName}
             />
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+              <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-[#a6ccac]">
+                <input
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={(event) => setShowPassword(event.target.checked)}
+                  className="accent-[#759d7b]"
+                />
+                Show temporary password
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setPassword(generateTemporaryPassword());
+                  setShowPassword(true);
+                }}
+                className="rounded-full border border-[#5f7362] px-3 py-1 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#354a38]"
+              >
+                Generate new
+              </button>
+            </div>
             <ul className="mt-2 grid gap-1 rounded-xl border border-[#354a38] bg-[#243329] p-3 text-xs leading-5 text-[#a6ccac] sm:grid-cols-2">
               <Check ok={passwordChecks.length} text="At least 12 characters" />
               <Check ok={passwordChecks.upper} text="Uppercase letter" />
@@ -246,7 +272,44 @@ const inputClassName =
   "mt-1 w-full rounded-xl border border-[#354a38] bg-[#243329] px-3 py-2 text-sm text-white caret-white outline-none focus:border-[#759d7b]";
 
 function Check({ ok, text }: { ok: boolean; text: string }) {
-  return <li className={ok ? "text-[#9bd4a4]" : "text-[#a6ccac]"}>{ok ? "OK" : "-"} {text}</li>;
+  return (
+    <li className={ok ? "text-[#9bd4a4]" : "text-[#a6ccac]"}>
+      <span className={ok ? "font-bold text-[#39ff88]" : ""}>{ok ? "✓" : "-"}</span> {text}
+    </li>
+  );
+}
+
+function generateTemporaryPassword() {
+  const lower = "abcdefghijkmnopqrstuvwxyz";
+  const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const numbers = "23456789";
+  const specials = "!@#$%&*?";
+  const all = `${lower}${upper}${numbers}${specials}`;
+  const required = [
+    randomChar(lower),
+    randomChar(upper),
+    randomChar(numbers),
+    randomChar(specials),
+  ];
+  const rest = Array.from({ length: 10 }, () => randomChar(all));
+  return shuffle([...required, ...rest]).join("");
+}
+
+function randomChar(chars: string) {
+  const values = new Uint32Array(1);
+  crypto.getRandomValues(values);
+  return chars[values[0] % chars.length];
+}
+
+function shuffle(chars: string[]) {
+  const next = [...chars];
+  for (let i = next.length - 1; i > 0; i -= 1) {
+    const values = new Uint32Array(1);
+    crypto.getRandomValues(values);
+    const j = values[0] % (i + 1);
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
 }
 
 const autofillCss = `
