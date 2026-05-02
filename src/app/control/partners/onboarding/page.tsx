@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PartnersTabs } from "../partners-tabs";
+import { PartnerOnboardingForm } from "./partner-onboarding-form";
 
 export const dynamic = "force-dynamic";
 
@@ -26,15 +27,7 @@ export default function PartnerOnboardingPage() {
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-[#354a38] bg-[#2c3d2f] p-6">
-        <p className="text-xs font-semibold uppercase tracking-wide text-[#7a9b80]">
-          On Boarding
-        </p>
-        <h2 className="mt-2 text-xl font-semibold text-white">Partner onboarding pipeline</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-[#a6ccac]">
-          Pending partner registration, documentation, and approval steps will live here.
-        </p>
-      </section>
+      <PartnerOnboardingForm />
     </div>
   );
 }
