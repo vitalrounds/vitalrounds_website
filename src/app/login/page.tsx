@@ -7,19 +7,19 @@ export default function LoginPage() {
 
   return (
     <main
-      className="min-h-screen bg-[#f5fbf6] bg-cover bg-center px-4 py-8 text-[#2c3d2f] sm:px-6 sm:py-10"
+      className="relative h-dvh overflow-hidden bg-[#f5fbf6] bg-cover bg-center px-4 text-[#2c3d2f] sm:px-6"
       style={{
         backgroundImage:
           "linear-gradient(rgba(245, 251, 246, 0.76), rgba(245, 251, 246, 0.84)), url('/login-wallpaper.png')",
       }}
     >
-      <div className="mx-auto max-w-lg">
-        <Link
-          href="/"
-          className="mb-6 inline-block text-sm font-semibold text-[#759d7b] hover:text-[#5f7362]"
-        >
-          ← Back to VitalRounds
-        </Link>
+      <Link
+        href="/"
+        className="absolute left-5 top-4 z-10 text-sm font-semibold text-[#759d7b] hover:text-[#5f7362] sm:left-8 sm:top-6"
+      >
+        ← Back to VitalRounds
+      </Link>
+      <div className="mx-auto flex h-full max-w-lg items-center justify-center pt-8">
         <Suspense fallback={<p className="text-sm text-[#6e706e]">Loading…</p>}>
           <LoginForm controlOrigin={controlOrigin} />
         </Suspense>

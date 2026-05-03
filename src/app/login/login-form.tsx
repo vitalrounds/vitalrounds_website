@@ -118,7 +118,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
   return (
     <form
       onSubmit={onSubmit}
-      className="mx-auto max-w-md space-y-5 rounded-3xl border border-[#a6ccac] bg-white p-8 shadow-sm"
+      className="mx-auto max-h-[calc(100dvh-5rem)] w-full max-w-md space-y-4 rounded-3xl border border-[#a6ccac] bg-white p-6 shadow-sm sm:p-7"
     >
       <div>
         <Image
@@ -127,7 +127,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
           width={210}
           height={48}
           priority
-          className="mx-auto mb-6 h-auto w-[170px]"
+          className="mx-auto mb-5 h-auto w-[150px] sm:w-[165px]"
         />
         <h1 className="text-2xl font-semibold text-[#2c3d2f]">
           {forgotMode ? "Reset password" : "Sign in"}
@@ -180,7 +180,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-[#759d7b] py-3 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:opacity-60"
+        className="w-full rounded-full bg-[#759d7b] py-2.5 text-sm font-semibold text-white transition hover:bg-[#5f7362] disabled:opacity-60"
       >
         {loading ? (forgotMode ? "Sending..." : "Signing in...") : forgotMode ? "Send reset link" : "Sign in"}
       </button>
