@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vitalrounds.com.au";
-const googleAnalyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-C3T5851SNS";
+const googleAnalyticsId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-C3T5851SM5";
 
 // Tab icon: `icon.png` + `apple-icon.png` in this folder (App Router file convention).
 // Avoid `favicon.ico` here — browsers prefer it and it was still the default triangle.
