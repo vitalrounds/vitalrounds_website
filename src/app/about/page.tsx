@@ -95,16 +95,11 @@ export default function AboutPage() {
               experience, and AHPRA-aware preparation.
             </p>
           </div>
-          <div className="relative overflow-hidden rounded-2xl bg-[#e5f3e8] p-4 md:col-span-4">
-            <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#cbecd0]" />
-            <div className="absolute -bottom-10 left-6 h-24 w-24 rounded-full bg-[#a6ccac]/60" />
-            <p className="relative text-xs font-semibold uppercase tracking-wide text-[#354a38]">
-              Growth &amp; Mentorship
-            </p>
-            <p className="relative mt-2 text-sm leading-7 text-[#354a38]">
-              Helping doctors build practical confidence through guided exposure and feedback loops.
-            </p>
-          </div>
+          <BrandPanel
+            title="Growth & Mentorship"
+            description="Guided exposure, feedback loops, and practical confidence for career progression."
+            icon="mentorship"
+          />
         </article>
 
         <article className="grid gap-5 rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm md:grid-cols-12">
@@ -116,16 +111,11 @@ export default function AboutPage() {
               is fewer bottlenecks and better matching decisions.
             </p>
           </div>
-          <div className="relative overflow-hidden rounded-2xl bg-[#e8f0fb] p-4 md:col-span-4">
-            <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#d6e4ff]" />
-            <div className="absolute -bottom-8 left-2 h-20 w-20 rounded-full bg-[#bfd4ff]/70" />
-            <p className="relative text-xs font-semibold uppercase tracking-wide text-[#2f4b7c]">
-              Data &amp; Insights
-            </p>
-            <p className="relative mt-2 text-sm leading-7 text-[#2f4b7c]">
-              Structured intake and review data to improve placement readiness over time.
-            </p>
-          </div>
+          <BrandPanel
+            title="Data & Insights"
+            description="Structured intake, organized documents, and clearer readiness signals over time."
+            icon="insights"
+          />
         </article>
 
         <article className="grid gap-5 rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm md:grid-cols-12">
@@ -137,16 +127,11 @@ export default function AboutPage() {
               communication fluency, and system familiarity.
             </p>
           </div>
-          <div className="relative overflow-hidden rounded-2xl bg-[#fdf0e4] p-4 md:col-span-4">
-            <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-[#ffe0bf]" />
-            <div className="absolute -bottom-10 left-6 h-24 w-24 rounded-full bg-[#ffd1a0]/70" />
-            <p className="relative text-xs font-semibold uppercase tracking-wide text-[#7b4d1f]">
-              Patient Care Paths
-            </p>
-            <p className="relative mt-2 text-sm leading-7 text-[#7b4d1f]">
-              Better prepared doctors support safer care pathways and stronger team integration.
-            </p>
-          </div>
+          <BrandPanel
+            title="Patient Care Paths"
+            description="Better prepared doctors, safer care pathways, and stronger team integration."
+            icon="care"
+          />
         </article>
 
         <article className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm">
@@ -170,5 +155,83 @@ export default function AboutPage() {
         </article>
       </section>
     </main>
+  );
+}
+
+function BrandPanel({
+  title,
+  description,
+  icon,
+}: {
+  title: string;
+  description: string;
+  icon: "mentorship" | "insights" | "care";
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-[1.4rem] border border-[#c7ddcb] bg-gradient-to-br from-[#eef7ef] via-[#e4f0e6] to-[#d8e8dc] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] md:col-span-4">
+      <div className="pointer-events-none absolute inset-0 opacity-70">
+        <svg viewBox="0 0 260 190" className="h-full w-full" aria-hidden="true">
+          <path
+            d="M-20 122c34-32 69-32 103 0s70 32 108 0 67-31 93-3"
+            fill="none"
+            stroke="#9fbda5"
+            strokeWidth="9"
+            strokeLinecap="round"
+            opacity="0.5"
+          />
+          <path
+            d="M-11 62c29-26 60-25 92 1s64 25 96 0 58-27 86-5"
+            fill="none"
+            stroke="#6f8f75"
+            strokeDasharray="6 9"
+            strokeLinecap="round"
+            strokeWidth="2"
+            opacity="0.45"
+          />
+          <circle cx="206" cy="43" r="56" fill="#c5e5ca" opacity="0.45" />
+          <circle cx="40" cy="162" r="45" fill="#b2d3b8" opacity="0.4" />
+        </svg>
+      </div>
+      <div className="relative flex min-h-48 flex-col justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#354a38]">{title}</p>
+          <p className="mt-3 text-sm leading-7 text-[#405844]">{description}</p>
+        </div>
+        <div className="mt-6 flex items-end justify-between gap-4">
+          <PanelIcon icon={icon} />
+          <span className="h-2 w-20 rounded-full bg-[#759d7b]/40" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PanelIcon({ icon }: { icon: "mentorship" | "insights" | "care" }) {
+  if (icon === "mentorship") {
+    return (
+      <svg viewBox="0 0 92 72" className="h-16 w-20 text-[#5f7362]" fill="none" aria-hidden="true">
+        <path d="M14 51h24l9-9h31" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M18 23h22v22H18zM52 17h22v22H52z" stroke="currentColor" strokeWidth="2" />
+        <path d="m40 32 12-4M63 39v13M57 46h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (icon === "insights") {
+    return (
+      <svg viewBox="0 0 92 72" className="h-16 w-20 text-[#5f7362]" fill="none" aria-hidden="true">
+        <path d="M18 52V28M36 52V18M54 52V34M72 52V24" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M13 53h66" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path d="M20 23c12 9 23 9 33 0s18-10 26-2" stroke="currentColor" strokeWidth="2" strokeDasharray="4 6" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 92 72" className="h-16 w-20 text-[#5f7362]" fill="none" aria-hidden="true">
+      <path d="M18 28h56v28H18z" stroke="currentColor" strokeWidth="2" />
+      <path d="M30 28V18h32v10M46 34v16M38 42h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 50c12 13 24 13 36 0s24-13 36 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.65" />
+    </svg>
   );
 }
