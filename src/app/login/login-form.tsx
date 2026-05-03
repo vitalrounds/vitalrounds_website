@@ -127,7 +127,7 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
           width={210}
           height={48}
           priority
-          className="mb-6 h-auto w-[170px]"
+          className="mx-auto mb-6 h-auto w-[170px]"
         />
         <h1 className="text-2xl font-semibold text-[#2c3d2f]">
           {forgotMode ? "Reset password" : "Sign in"}
