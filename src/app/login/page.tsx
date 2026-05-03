@@ -6,7 +6,13 @@ export default function LoginPage() {
   const controlOrigin = process.env.NEXT_PUBLIC_CONTROL_ORIGIN;
 
   return (
-    <main className="min-h-screen bg-[#f5fbf6] px-4 py-8 text-[#2c3d2f] sm:px-6 sm:py-10">
+    <main
+      className="min-h-screen bg-[#f5fbf6] bg-cover bg-center px-4 py-8 text-[#2c3d2f] sm:px-6 sm:py-10"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(245, 251, 246, 0.76), rgba(245, 251, 246, 0.84)), url('/login-wallpaper.png')",
+      }}
+    >
       <div className="mx-auto max-w-lg">
         <Link
           href="/"
