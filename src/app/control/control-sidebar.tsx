@@ -16,38 +16,61 @@ const bottomItems = [
   { href: "/control/settings", label: "Settings", icon: SettingsIcon },
 ] as const;
 
-export function ControlSidebar({ collapsed }: { collapsed: boolean }) {
+export function ControlSidebar({
+  collapsed,
+  mobileOpen = false,
+  onNavigate,
+}: {
+  collapsed: boolean;
+  mobileOpen?: boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
+  const effectiveCollapsed = mobileOpen ? false : collapsed;
 
   return (
     <aside
       className={
-        collapsed
-          ? "w-16 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out"
-          : "w-56 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out"
+        mobileOpen
+          ? "fixed inset-y-0 left-0 z-40 w-64 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:shadow-none"
+          : collapsed
+            ? "hidden w-16 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
+            : "hidden w-56 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
       }
     >
       <nav
         className={
-          collapsed
+          effectiveCollapsed
             ? "sticky top-0 flex h-full min-h-0 w-16 flex-col gap-1 px-2 py-4 transition-[padding] duration-300 ease-in-out"
-            : "sticky top-0 flex h-full min-h-0 w-56 flex-col gap-1 px-3 py-4 transition-[padding] duration-300 ease-in-out"
+            : "sticky top-0 flex h-full min-h-0 w-64 flex-col gap-1 px-3 py-4 transition-[padding] duration-300 ease-in-out md:w-56"
         }
         aria-label="Control panel"
       >
-        {!collapsed && (
+        {!effectiveCollapsed && (
           <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--control-muted)]">
             Navigate
           </p>
         )}
         <div className="flex flex-col gap-1">
           {items.map((item) => (
-            <SidebarItem key={item.href} item={item} pathname={pathname} collapsed={collapsed} />
+            <SidebarItem
+              key={item.href}
+              item={item}
+              pathname={pathname}
+              collapsed={effectiveCollapsed}
+              onNavigate={onNavigate}
+            />
           ))}
         </div>
         <div className="mt-auto flex flex-col gap-1 border-t border-[var(--control-border)] pt-3">
           {bottomItems.map((item) => (
-            <SidebarItem key={item.href} item={item} pathname={pathname} collapsed={collapsed} />
+            <SidebarItem
+              key={item.href}
+              item={item}
+              pathname={pathname}
+              collapsed={effectiveCollapsed}
+              onNavigate={onNavigate}
+            />
           ))}
         </div>
       </nav>
@@ -59,10 +82,12 @@ function SidebarItem({
   item,
   pathname,
   collapsed,
+  onNavigate,
 }: {
   item: (typeof items)[number] | (typeof bottomItems)[number];
   pathname: string;
   collapsed: boolean;
+  onNavigate?: () => void;
 }) {
   const { href, label, icon: Icon } = item;
   const active =
@@ -75,6 +100,7 @@ function SidebarItem({
       href={href}
       prefetch={false}
       title={collapsed ? label : undefined}
+      onClick={onNavigate}
       className={
         active
           ? "flex items-center gap-3 rounded-xl bg-[var(--control-active)] px-3 py-2.5 text-sm font-medium text-[var(--control-text)]"

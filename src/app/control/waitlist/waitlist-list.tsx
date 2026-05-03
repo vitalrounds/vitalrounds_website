@@ -71,7 +71,7 @@ export default function WaitlistList({ initialRows }: { initialRows: Row[] }) {
       )}
 
       <div className="overflow-hidden rounded-2xl border border-[#354a38] bg-[#2c3d2f]">
-        <div className="grid grid-cols-12 border-b border-[#354a38] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#a6ccac]">
+        <div className="hidden grid-cols-12 border-b border-[#354a38] px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#a6ccac] md:grid">
           <div className="col-span-4">Applicant</div>
           <div className="col-span-4">Current city</div>
           <div className="col-span-3">Applied</div>
@@ -85,24 +85,30 @@ export default function WaitlistList({ initialRows }: { initialRows: Row[] }) {
           return (
             <div
               key={row.id}
-              className="grid grid-cols-12 items-center gap-2 border-b border-[#354a38]/70 px-4 py-3 text-sm text-[#cbecd0] last:border-b-0"
+              className="space-y-3 border-b border-[#354a38]/70 px-4 py-4 text-sm text-[#cbecd0] last:border-b-0 md:grid md:grid-cols-12 md:items-center md:gap-2 md:space-y-0 md:py-3"
             >
               <Link
                 href={`/control/waitlist/${row.id}`}
-                className="col-span-11 -mx-2 grid grid-cols-11 items-center rounded-lg px-2 py-1 transition hover:bg-[var(--control-hover)]"
+                className="block rounded-lg px-2 py-2 transition hover:bg-[var(--control-hover)] md:col-span-11 md:-mx-2 md:grid md:grid-cols-11 md:items-center md:py-1"
               >
-                <div className="col-span-4 min-w-0">
+                <div className="min-w-0 md:col-span-4">
                   <p className="truncate font-medium text-white">{name}</p>
                   <p className="truncate text-xs text-[#a6ccac]">{row.applicant_email ?? "No email"}</p>
                 </div>
-                <div className="col-span-4 truncate">{city}</div>
-                <div className="col-span-3 text-xs text-[#a6ccac]">
-                  {new Date(row.created_at).toLocaleDateString("en-AU", {
-                    dateStyle: "medium",
-                  })}
+                <div className="mt-3 grid gap-2 text-xs text-[#a6ccac] sm:grid-cols-2 md:mt-0 md:contents">
+                  <div className="truncate md:col-span-4 md:text-sm md:text-[#cbecd0]">
+                    <span className="font-semibold uppercase tracking-wider md:hidden">City: </span>
+                    {city}
+                  </div>
+                  <div className="md:col-span-3">
+                    <span className="font-semibold uppercase tracking-wider md:hidden">Applied: </span>
+                    {new Date(row.created_at).toLocaleDateString("en-AU", {
+                      dateStyle: "medium",
+                    })}
+                  </div>
                 </div>
               </Link>
-              <div className="col-span-1 flex justify-end">
+              <div className="flex justify-end md:col-span-1">
                 <button
                   type="button"
                   onClick={() => onDelete(row)}

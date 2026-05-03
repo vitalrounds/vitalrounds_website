@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 type PartnerTheme = "dark" | "light";
 
@@ -50,16 +50,17 @@ export function PartnerPortalShell({
   userName: string;
 }) {
   const pathname = usePathname();
-  const [theme, setThemeState] = useState<PartnerTheme>("dark");
-  const [collapsed, setCollapsed] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
+  const [theme, setThemeState] = useState<PartnerTheme>(() => {
+    if (typeof window === "undefined") return "dark";
     const savedTheme = window.localStorage.getItem("vitalrounds-partner-theme");
-    if (savedTheme === "dark" || savedTheme === "light") setThemeState(savedTheme);
-    const savedSidebar = window.localStorage.getItem("vitalrounds-partner-sidebar");
-    if (savedSidebar === "collapsed") setCollapsed(true);
-  }, []);
+    return savedTheme === "dark" || savedTheme === "light" ? savedTheme : "dark";
+  });
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("vitalrounds-partner-sidebar") === "collapsed";
+  });
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const value = useMemo(
     () => ({
@@ -82,6 +83,7 @@ export function PartnerPortalShell({
 
   const logoSrc = theme === "dark" ? "/logo_white.png" : "/logo.png";
   const initials = getInitials(userName);
+  const effectiveCollapsed = mobileNavOpen ? false : collapsed;
 
   return (
     <PartnerThemeContext.Provider value={value}>
@@ -91,24 +93,32 @@ export function PartnerPortalShell({
       >
         <style>{partnerThemeCss}</style>
         <header className="border-b border-[var(--partner-border)] bg-[var(--partner-header)]">
-          <div className="flex items-center justify-between px-5 py-2.5">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(true)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--partner-border)] text-[var(--partner-muted)] transition hover:bg-[var(--partner-hover)] hover:text-[var(--partner-text)] md:hidden"
+                aria-label="Open menu"
+              >
+                <MenuIcon />
+              </button>
               <button
                 type="button"
                 onClick={toggleSidebar}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--partner-border)] text-[var(--partner-muted)] transition hover:bg-[var(--partner-hover)] hover:text-[var(--partner-text)]"
+                className="hidden h-8 w-8 items-center justify-center rounded-full border border-[var(--partner-border)] text-[var(--partner-muted)] transition hover:bg-[var(--partner-hover)] hover:text-[var(--partner-text)] md:inline-flex"
                 aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
               </button>
-              <Link href="/provider/dashboard" className="inline-flex items-center">
+              <Link href="/provider/dashboard" className="inline-flex min-w-0 items-center">
                 <Image
                   src={logoSrc}
                   alt="VitalRounds Partner Portal"
                   width={190}
                   height={42}
                   priority
-                  className="h-auto w-[130px] sm:w-[150px]"
+                  className="h-auto w-[118px] sm:w-[150px]"
                 />
               </Link>
             </div>
@@ -154,22 +164,32 @@ export function PartnerPortalShell({
         </header>
 
         <div className="flex min-h-0 flex-1">
+          {mobileNavOpen && (
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="fixed inset-0 z-30 bg-black/45 backdrop-blur-sm md:hidden"
+              onClick={() => setMobileNavOpen(false)}
+            />
+          )}
           <aside
             className={
-              collapsed
-                ? "w-16 shrink-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] transition-[width] duration-300 ease-in-out"
-                : "w-60 shrink-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] transition-[width] duration-300 ease-in-out"
+              mobileNavOpen
+                ? "fixed inset-y-0 left-0 z-40 w-64 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:shadow-none"
+                : collapsed
+                  ? "hidden w-16 shrink-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
+                  : "hidden w-60 shrink-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
             }
           >
             <nav
               className={
-                collapsed
+                effectiveCollapsed
                   ? "sticky top-0 flex h-full min-h-0 w-16 flex-col gap-1 px-2 py-4"
-                  : "sticky top-0 flex h-full min-h-0 w-60 flex-col gap-1 px-3 py-4"
+                  : "sticky top-0 flex h-full min-h-0 w-64 flex-col gap-1 px-3 py-4 md:w-60"
               }
               aria-label="Partner portal"
             >
-              {!collapsed && (
+              {!effectiveCollapsed && (
                 <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--partner-muted)]">
                   Navigate
                 </p>
@@ -182,7 +202,8 @@ export function PartnerPortalShell({
                     <Link
                       key={item.href}
                       href={item.href}
-                      title={collapsed ? item.label : undefined}
+                      title={effectiveCollapsed ? item.label : undefined}
+                      onClick={() => setMobileNavOpen(false)}
                       className={
                         active
                           ? "flex items-center gap-3 rounded-xl bg-[var(--partner-active)] px-3 py-2.5 text-sm font-medium text-[var(--partner-text)]"
@@ -190,7 +211,7 @@ export function PartnerPortalShell({
                       }
                     >
                       <Icon />
-                      {!collapsed && <span>{item.label}</span>}
+                      {!effectiveCollapsed && <span>{item.label}</span>}
                     </Link>
                   );
                 })}
@@ -198,7 +219,8 @@ export function PartnerPortalShell({
               <div className="mt-auto border-t border-[var(--partner-border)] pt-3">
                 <Link
                   href="/provider/settings"
-                  title={collapsed ? "Settings" : undefined}
+                  title={effectiveCollapsed ? "Settings" : undefined}
+                  onClick={() => setMobileNavOpen(false)}
                   className={
                     pathname === "/provider/settings"
                       ? "flex items-center gap-3 rounded-xl bg-[var(--partner-active)] px-3 py-2.5 text-sm font-medium text-[var(--partner-text)]"
@@ -206,12 +228,14 @@ export function PartnerPortalShell({
                   }
                 >
                   <SettingsIcon />
-                  {!collapsed && <span>Settings</span>}
+                  {!effectiveCollapsed && <span>Settings</span>}
                 </Link>
               </div>
             </nav>
           </aside>
-          <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+          <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
+            {children}
+          </main>
         </div>
       </div>
     </PartnerThemeContext.Provider>
@@ -279,6 +303,10 @@ function ChevronLeftIcon() {
 
 function ChevronRightIcon() {
   return <IconPath d="M7.5 4.5 13 10l-5.5 5.5" />;
+}
+
+function MenuIcon() {
+  return <IconPath d="M4 6h12M4 10h12M4 14h12" />;
 }
 
 function HomeIcon() {

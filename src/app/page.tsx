@@ -136,7 +136,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <section className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-7 md:px-10">
+      <section className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-3 px-4 py-5 sm:px-6 sm:py-7 md:px-10">
         <Link href="/" className="inline-flex items-center gap-3">
           <Image
             src="/logo.png"
@@ -144,10 +144,10 @@ export default function Home() {
             width={240}
             height={54}
             priority
-            className="h-auto w-[150px] sm:w-[210px] md:w-[240px]"
+            className="h-auto w-[122px] sm:w-[210px] md:w-[240px]"
           />
         </Link>
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3">
           <Link
             href="/about"
             className="hidden rounded-full border border-[#759d7b] px-4 py-2 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] md:inline-flex"
@@ -162,15 +162,16 @@ export default function Home() {
           </Link>
           <Link
             href="/login"
-            className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full border border-[#759d7b] px-4 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] sm:px-5"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-full border border-[#759d7b] px-3 text-sm font-semibold text-[#354a38] transition hover:bg-[#cbecd0] sm:h-10 sm:px-5"
           >
             Login
           </Link>
           <Link
             href="/waitlist"
-            className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-[#759d7b] px-4 text-sm font-semibold text-white transition hover:bg-[#5f7362] sm:px-5"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-full bg-[#759d7b] px-3 text-sm font-semibold text-white transition hover:bg-[#5f7362] sm:h-10 sm:px-5"
           >
-            Join the wait list
+            <span className="sm:hidden">Wait list</span>
+            <span className="hidden sm:inline">Join the wait list</span>
           </Link>
         </div>
       </section>

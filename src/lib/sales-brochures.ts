@@ -8,6 +8,38 @@ export type SalesBrochureItem = {
   updatedAt: string | null;
 };
 
+type StorageError = {
+  message?: string;
+};
+
+type StorageListEntry = {
+  name?: string;
+  updated_at?: string | null;
+  metadata?: { size?: number } | null;
+};
+
+type SalesBrochuresAdmin = {
+  storage: {
+    createBucket: (
+      id: string,
+      options: {
+        public: boolean;
+        fileSizeLimit: number;
+        allowedMimeTypes: string[];
+      },
+    ) => Promise<{ error: StorageError | null }>;
+    from: (id: string) => {
+      list: (
+        path: string,
+        options: {
+          limit: number;
+          sortBy: { column: string; order: "asc" | "desc" };
+        },
+      ) => Promise<{ data: StorageListEntry[] | null; error: StorageError | null }>;
+    };
+  };
+};
+
 export function getSalesBrochuresBucket() {
   return SALES_BROCHURES_BUCKET;
 }
@@ -30,7 +62,7 @@ export function sanitizeBrochureName(name: string) {
   return normalized.endsWith(".pdf") ? normalized : `${normalized}.pdf`;
 }
 
-export async function ensureSalesBrochuresBucket(admin: any) {
+export async function ensureSalesBrochuresBucket(admin: SalesBrochuresAdmin) {
   const { error } = await admin.storage.createBucket(SALES_BROCHURES_BUCKET, {
     public: false,
     fileSizeLimit: 20 * 1024 * 1024,
@@ -43,7 +75,7 @@ export async function ensureSalesBrochuresBucket(admin: any) {
   throw new Error(error.message || "Could not create sales brochure bucket.");
 }
 
-export async function listSalesBrochures(admin: any) {
+export async function listSalesBrochures(admin: SalesBrochuresAdmin) {
   await ensureSalesBrochuresBucket(admin);
 
   const { data, error } = await admin.storage.from(SALES_BROCHURES_BUCKET).list(SALES_BROCHURES_PREFIX, {
@@ -55,13 +87,16 @@ export async function listSalesBrochures(admin: any) {
   }
 
   return (data ?? [])
-    .filter((entry: { name?: string }) => String(entry.name ?? "").toLowerCase().endsWith(".pdf"))
+    .filter((entry) => String(entry.name ?? "").toLowerCase().endsWith(".pdf"))
     .map(
-      (entry: { name: string; updated_at?: string | null; metadata?: { size?: number } | null }): SalesBrochureItem => ({
-        name: entry.name,
-        path: `${SALES_BROCHURES_PREFIX}/${entry.name}`,
-        size: Number(entry.metadata?.size ?? 0),
-        updatedAt: entry.updated_at ?? null,
-      }),
+      (entry): SalesBrochureItem => {
+        const name = entry.name ?? "brochure.pdf";
+        return {
+          name,
+          path: `${SALES_BROCHURES_PREFIX}/${name}`,
+          size: Number(entry.metadata?.size ?? 0),
+          updatedAt: entry.updated_at ?? null,
+        };
+      },
     );
 }

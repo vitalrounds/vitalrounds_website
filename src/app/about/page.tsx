@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main
-      className="min-h-screen text-[#2c3d2f]"
+      className="min-h-screen overflow-x-clip text-[#2c3d2f]"
       style={{
         background:
           "radial-gradient(circle at 0% 0%, #f8fcf8 0%, #ecf4ed 43%, #e2ede4 72%, #d7e6d9 100%)",
@@ -21,7 +21,13 @@ export default function AboutPage() {
       <section className="mx-auto max-w-6xl px-6 py-12 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/" className="inline-flex items-center gap-3">
-            <Image src="/logo.png" alt="VitalRounds" width={220} height={48} />
+            <Image
+              src="/logo.png"
+              alt="VitalRounds"
+              width={220}
+              height={48}
+              className="h-auto w-[150px] sm:w-[220px]"
+            />
           </Link>
           <Link
             href="/contact"

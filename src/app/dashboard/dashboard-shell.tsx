@@ -43,18 +43,19 @@ export function DoctorPortalShell({
   avatarPosition?: string;
 }) {
   const pathname = usePathname();
-  const [theme, setTheme] = useState<Theme>("dark");
-  const [collapsed, setCollapsed] = useState(false);
+  const [theme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "dark";
+    const savedTheme = window.localStorage.getItem("vitalrounds-doctor-theme");
+    return savedTheme === "dark" || savedTheme === "light" ? savedTheme : "dark";
+  });
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("vitalrounds-doctor-sidebar") === "collapsed";
+  });
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [headerAvatarUrl, setHeaderAvatarUrl] = useState<string | null>(null);
   const [headerAvatarPosition, setHeaderAvatarPosition] = useState(avatarPosition ?? "50% 50%");
-
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem("vitalrounds-doctor-theme");
-    if (savedTheme === "dark" || savedTheme === "light") setTheme(savedTheme);
-    const savedSidebar = window.localStorage.getItem("vitalrounds-doctor-sidebar");
-    if (savedSidebar === "collapsed") setCollapsed(true);
-  }, []);
 
   useEffect(() => {
     let timeoutId = window.setTimeout(() => {
@@ -83,7 +84,7 @@ export function DoctorPortalShell({
 
   useEffect(() => {
     if (!avatarPath) {
-      setHeaderAvatarUrl(null);
+      queueMicrotask(() => setHeaderAvatarUrl(null));
       return;
     }
 
@@ -91,7 +92,9 @@ export function DoctorPortalShell({
     void getSignedAvatarUrl(avatarPath).then((url) => {
       if (!cancelled) setHeaderAvatarUrl(url);
     });
-    setHeaderAvatarPosition(avatarPosition ?? "50% 50%");
+    queueMicrotask(() => {
+      if (!cancelled) setHeaderAvatarPosition(avatarPosition ?? "50% 50%");
+    });
 
     return () => {
       cancelled = true;
@@ -134,6 +137,7 @@ export function DoctorPortalShell({
 
   const logoSrc = theme === "dark" ? "/logo_white.png" : "/logo.png";
   const initials = getInitials(userName);
+  const effectiveCollapsed = mobileNavOpen ? false : collapsed;
 
   return (
     <div
@@ -142,24 +146,32 @@ export function DoctorPortalShell({
     >
       <style>{doctorThemeCss}</style>
       <header className="border-b border-[var(--doctor-border)] bg-[var(--doctor-header)]">
-        <div className="flex items-center justify-between px-5 py-2.5">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--doctor-border)] text-[var(--doctor-muted)] transition hover:bg-[var(--doctor-hover)] hover:text-[var(--doctor-text)] md:hidden"
+              aria-label="Open menu"
+            >
+              <MenuIcon />
+            </button>
             <button
               type="button"
               onClick={toggleSidebar}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--doctor-border)] text-[var(--doctor-muted)] transition hover:bg-[var(--doctor-hover)] hover:text-[var(--doctor-text)]"
+              className="hidden h-8 w-8 items-center justify-center rounded-full border border-[var(--doctor-border)] text-[var(--doctor-muted)] transition hover:bg-[var(--doctor-hover)] hover:text-[var(--doctor-text)] md:inline-flex"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             </button>
-            <Link href="/dashboard" className="inline-flex items-center">
+            <Link href="/dashboard" className="inline-flex min-w-0 items-center">
               <Image
                 src={logoSrc}
                 alt="VitalRounds Doctor Portal"
                 width={190}
                 height={42}
                 priority
-                className="h-auto w-[130px] sm:w-[150px]"
+                className="h-auto w-[118px] sm:w-[150px]"
               />
             </Link>
           </div>
@@ -222,22 +234,32 @@ export function DoctorPortalShell({
       </header>
 
       <div className="flex min-h-0 flex-1">
+        {mobileNavOpen && (
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="fixed inset-0 z-30 bg-black/45 backdrop-blur-sm md:hidden"
+            onClick={() => setMobileNavOpen(false)}
+          />
+        )}
         <aside
           className={
-            collapsed
-              ? "w-16 shrink-0 overflow-hidden border-r border-[var(--doctor-border)] bg-[var(--doctor-surface-strong)] transition-[width] duration-300 ease-in-out"
-              : "w-56 shrink-0 overflow-hidden border-r border-[var(--doctor-border)] bg-[var(--doctor-surface-strong)] transition-[width] duration-300 ease-in-out"
+            mobileNavOpen
+              ? "fixed inset-y-0 left-0 z-40 w-64 overflow-hidden border-r border-[var(--doctor-border)] bg-[var(--doctor-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:shadow-none"
+              : collapsed
+                ? "hidden w-16 shrink-0 overflow-hidden border-r border-[var(--doctor-border)] bg-[var(--doctor-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
+                : "hidden w-56 shrink-0 overflow-hidden border-r border-[var(--doctor-border)] bg-[var(--doctor-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
           }
         >
           <nav
             className={
-              collapsed
+              effectiveCollapsed
                 ? "sticky top-0 flex h-full min-h-0 w-16 flex-col gap-1 px-2 py-4"
-                : "sticky top-0 flex h-full min-h-0 w-56 flex-col gap-1 px-3 py-4"
+                : "sticky top-0 flex h-full min-h-0 w-64 flex-col gap-1 px-3 py-4 md:w-56"
             }
             aria-label="Doctor portal"
           >
-            {!collapsed && (
+            {!effectiveCollapsed && (
               <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--doctor-muted)]">
                 Navigate
               </p>
@@ -253,7 +275,8 @@ export function DoctorPortalShell({
                   <Link
                     key={item.href}
                     href={item.href}
-                    title={collapsed ? item.label : undefined}
+                    title={effectiveCollapsed ? item.label : undefined}
+                    onClick={() => setMobileNavOpen(false)}
                     className={
                       active
                         ? "flex items-center gap-3 rounded-xl bg-[var(--doctor-active)] px-3 py-2.5 text-sm font-medium text-[var(--doctor-text)]"
@@ -261,7 +284,7 @@ export function DoctorPortalShell({
                     }
                   >
                     <Icon />
-                    {!collapsed && <span>{item.label}</span>}
+                    {!effectiveCollapsed && <span>{item.label}</span>}
                   </Link>
                 );
               })}
@@ -269,7 +292,8 @@ export function DoctorPortalShell({
             <div className="mt-auto border-t border-[var(--doctor-border)] pt-3">
               <Link
                 href="/dashboard/settings"
-                title={collapsed ? "Settings" : undefined}
+                title={effectiveCollapsed ? "Settings" : undefined}
+                onClick={() => setMobileNavOpen(false)}
                 className={
                   pathname === "/dashboard/settings"
                     ? "flex items-center gap-3 rounded-xl bg-[var(--doctor-active)] px-3 py-2.5 text-sm font-medium text-[var(--doctor-text)]"
@@ -277,23 +301,25 @@ export function DoctorPortalShell({
                 }
               >
                 <SettingsIcon />
-                {!collapsed && <span>Settings</span>}
+                {!effectiveCollapsed && <span>Settings</span>}
               </Link>
             </div>
           </nav>
         </aside>
-        <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+        <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
+          {children}
+        </main>
       </div>
     </div>
   );
 }
 
 export function DoctorThemeSettings() {
-  const [theme, setTheme] = useState<Theme>("dark");
-  useEffect(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "dark";
     const saved = window.localStorage.getItem("vitalrounds-doctor-theme");
-    if (saved === "dark" || saved === "light") setTheme(saved);
-  }, []);
+    return saved === "dark" || saved === "light" ? saved : "dark";
+  });
 
   function update(next: Theme) {
     setTheme(next);
@@ -371,6 +397,10 @@ function ChevronLeftIcon() {
 
 function ChevronRightIcon() {
   return <IconPath d="M7.5 4.5 13 10l-5.5 5.5" />;
+}
+
+function MenuIcon() {
+  return <IconPath d="M4 6h12M4 10h12M4 14h12" />;
 }
 
 function HomeIcon() {

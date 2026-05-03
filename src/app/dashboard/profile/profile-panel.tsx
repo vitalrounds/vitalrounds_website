@@ -47,6 +47,7 @@ export function ProfilePanel({
   const [activeTab, setActiveTab] = useState<Tab>("details");
   const [details, setDetails] = useState(() => normalizeDetails(initialDetails, email, fullName));
   const [documents, setDocuments] = useState<Record<string, unknown>>(initialDocuments);
+  const avatar = documents.avatar as DocumentRecord | undefined;
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +55,7 @@ export function ProfilePanel({
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
   const [selectedAvatarUrl, setSelectedAvatarUrl] = useState<string | null>(null);
-  const [avatarPosition, setAvatarPosition] = useState("50% 50%");
+  const [avatarPosition, setAvatarPosition] = useState(() => avatar?.avatarPosition ?? "50% 50%");
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const avatarDragRef = useRef<{
@@ -65,17 +66,12 @@ export function ProfilePanel({
     startPositionY: number;
   } | null>(null);
 
-  const avatar = documents.avatar as DocumentRecord | undefined;
   useEffect(() => {
     if (!avatar?.path) return;
     void openDocument(avatar.path, false).then((url) => {
       if (url) setAvatarUrl(url);
     });
   }, [avatar?.path]);
-
-  useEffect(() => {
-    setAvatarPosition(avatar?.avatarPosition ?? "50% 50%");
-  }, [avatar?.avatarPosition]);
 
   useEffect(() => {
     return () => {

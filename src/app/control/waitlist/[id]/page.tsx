@@ -63,7 +63,7 @@ export default async function ControlWaitlistSubmissionPage({
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold text-white">
+          <h1 className="text-2xl font-semibold text-white sm:text-3xl">
             {stringOrDash(payloadDetails.fullLegalName)}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-[#a6ccac]">
@@ -86,7 +86,7 @@ export default async function ControlWaitlistSubmissionPage({
               Submitted at: {formatMelbourneDateTime(submittedAtRaw)}
             </p>
           </div>
-          <div className="text-right text-xs text-[#a6ccac]">
+          <div className="text-left text-xs text-[#a6ccac] sm:text-right">
             <p>{formatMelbourneDateTime(row.created_at)}</p>
             <p className="mt-1 opacity-80">Submission ID: {row.id}</p>
           </div>
@@ -107,8 +107,8 @@ export default async function ControlWaitlistSubmissionPage({
         <section className="mt-6">
           <h3 className="text-sm font-semibold text-white">All details fields</h3>
           {detailsEntries.length > 0 ? (
-            <div className="mt-3 overflow-hidden rounded-xl border border-[var(--control-table-border)]">
-              <table className="min-w-full text-left text-sm">
+            <div className="mt-3 overflow-x-auto rounded-xl border border-[var(--control-table-border)]">
+              <table className="min-w-[40rem] text-left text-sm">
                 <tbody>
                   {detailsEntries.map(([key, value]) => (
                     <tr key={key} className="border-b border-[var(--control-table-border)] last:border-b-0">
@@ -131,8 +131,8 @@ export default async function ControlWaitlistSubmissionPage({
         <section className="mt-6">
           <h3 className="text-sm font-semibold text-white">All survey answers</h3>
           {surveyEntries.length > 0 ? (
-            <div className="mt-3 overflow-hidden rounded-xl border border-[var(--control-table-border)]">
-              <table className="min-w-full text-left text-sm">
+            <div className="mt-3 overflow-x-auto rounded-xl border border-[var(--control-table-border)]">
+              <table className="min-w-[40rem] text-left text-sm">
                 <tbody>
                   {surveyEntries.map(([key, value]) => (
                     <tr key={key} className="border-b border-[var(--control-table-border)] last:border-b-0">
@@ -159,12 +159,12 @@ export default async function ControlWaitlistSubmissionPage({
               {fileEntries.map(([key, file]) => (
                 <li
                   key={key}
-                  className="flex items-center justify-between rounded-xl border border-[var(--control-table-border)] bg-[#243329] px-3 py-2 text-sm"
+                  className="flex flex-col gap-2 rounded-xl border border-[var(--control-table-border)] bg-[#243329] px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <span className="truncate pr-3 text-[#cbecd0]">{file.name}</span>
+                  <span className="min-w-0 break-words text-[#cbecd0] sm:truncate sm:pr-3">{file.name}</span>
                   <Link
                     href={`/api/control/waitlist/files?path=${encodeURIComponent(file.path)}&name=${encodeURIComponent(file.name)}`}
-                    className="rounded-full border border-[#5f7362] px-3 py-1 text-xs text-[#cbecd0] hover:bg-[#354a38]"
+                    className="w-fit rounded-full border border-[#5f7362] px-3 py-1 text-xs text-[#cbecd0] hover:bg-[#354a38]"
                   >
                     Download
                   </Link>

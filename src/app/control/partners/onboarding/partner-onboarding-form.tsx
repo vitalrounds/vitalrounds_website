@@ -146,7 +146,7 @@ export function PartnerOnboardingForm() {
             <p className="text-sm font-semibold text-[#cbecd0]">Departments participating</p>
             <div className="mt-2 space-y-2">
               {departments.map((value, index) => (
-                <div key={index} className="flex gap-2">
+                <div key={index} className="flex flex-col gap-2 sm:flex-row">
                   <input
                     name="departments"
                     value={value}
@@ -167,7 +167,7 @@ export function PartnerOnboardingForm() {
                         current.length === 1 ? [""] : current.filter((_, itemIndex) => itemIndex !== index),
                       )
                     }
-                    className="mt-1 rounded-full border border-[#5f7362] px-4 py-2 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#354a38]"
+                    className="mt-1 w-fit rounded-full border border-[#5f7362] px-4 py-2 text-xs font-semibold text-[#cbecd0] transition hover:bg-[#354a38]"
                   >
                     Delete
                   </button>

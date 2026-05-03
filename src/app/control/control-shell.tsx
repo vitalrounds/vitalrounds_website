@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -30,20 +29,16 @@ export function useControlTheme() {
 }
 
 export function ControlShell({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ControlTheme>("dark");
-  const [collapsed, setCollapsed] = useState(false);
-
-  useEffect(() => {
+  const [theme, setThemeState] = useState<ControlTheme>(() => {
+    if (typeof window === "undefined") return "dark";
     const savedTheme = window.localStorage.getItem("vitalrounds-control-theme");
-    if (savedTheme === "light" || savedTheme === "dark") {
-      setThemeState(savedTheme);
-    }
-
-    const savedCollapsed = window.localStorage.getItem("vitalrounds-control-sidebar");
-    if (savedCollapsed === "collapsed") {
-      setCollapsed(true);
-    }
-  }, []);
+    return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+  });
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("vitalrounds-control-sidebar") === "collapsed";
+  });
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const value = useMemo(
     () => ({
@@ -74,42 +69,77 @@ export function ControlShell({ children }: { children: ReactNode }) {
       >
         <style>{controlThemeCss}</style>
         <header className="border-b border-[var(--control-border)] bg-[var(--control-header)]">
-          <div className="flex items-center justify-between px-5 py-2.5">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(true)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--control-border)] text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)] md:hidden"
+                aria-label="Open menu"
+              >
+                <MenuIcon />
+              </button>
               <button
                 type="button"
                 onClick={toggleSidebar}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--control-border)] text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)]"
+                className="hidden h-8 w-8 items-center justify-center rounded-full border border-[var(--control-border)] text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)] md:inline-flex"
                 aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                 title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               >
                 {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
               </button>
-              <Link href="/control" className="inline-flex items-center gap-3">
+              <Link href="/control" className="inline-flex min-w-0 items-center gap-3">
                 <Image
                   src={logoSrc}
                   alt="VitalRounds Control"
                   width={190}
                   height={42}
                   priority
-                  className="h-auto w-[130px] sm:w-[150px]"
+                  className="h-auto w-[118px] sm:w-[150px]"
                 />
               </Link>
             </div>
             <Link
               href="/auth/sign-out"
-              className="rounded-full border border-[var(--control-border)] px-3.5 py-1.5 text-xs font-semibold text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)]"
+              className="shrink-0 rounded-full border border-[var(--control-border)] px-3 py-1.5 text-xs font-semibold text-[var(--control-muted)] transition hover:bg-[var(--control-hover)] hover:text-[var(--control-text)] sm:px-3.5"
             >
               Sign out
             </Link>
           </div>
         </header>
         <div className="flex min-h-0 flex-1">
-          <ControlSidebar collapsed={collapsed} />
-          <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+          {mobileNavOpen && (
+            <button
+              type="button"
+              aria-label="Close menu"
+              className="fixed inset-0 z-30 bg-black/45 backdrop-blur-sm md:hidden"
+              onClick={() => setMobileNavOpen(false)}
+            />
+          )}
+          <ControlSidebar
+            collapsed={collapsed}
+            mobileOpen={mobileNavOpen}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
+          <main className="mx-auto min-w-0 w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
+            {children}
+          </main>
         </div>
       </div>
     </ControlThemeContext.Provider>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4" aria-hidden="true">
+      <path
+        d="M4 6h12M4 10h12M4 14h12"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
