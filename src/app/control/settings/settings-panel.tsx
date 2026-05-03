@@ -31,21 +31,21 @@ export default function SettingsPanel() {
             onClick={() => setTheme(option.id)}
             className={
               active
-                ? "rounded-2xl border border-[#759d7b] bg-[#354a38] p-5 text-left shadow-sm"
-                : "rounded-2xl border border-[#354a38] bg-[#2c3d2f] p-5 text-left transition hover:border-[#759d7b]"
+                ? "rounded-2xl border border-[#759d7b] bg-[var(--control-active)] p-5 text-left shadow-sm"
+                : "rounded-2xl border border-[var(--control-border)] bg-[var(--control-surface)] p-5 text-left transition hover:border-[#759d7b] hover:bg-[var(--control-hover)]"
             }
             aria-pressed={active}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-white">{option.title}</h2>
-                <p className="mt-2 text-sm leading-7 text-[#a6ccac]">{option.description}</p>
+                <h2 className="text-lg font-semibold text-[var(--control-text)]">{option.title}</h2>
+                <p className="mt-2 text-sm leading-7 text-[var(--control-muted)]">{option.description}</p>
               </div>
               <span
                 className={
                   active
                     ? "rounded-full bg-[#759d7b] px-3 py-1 text-xs font-semibold text-white"
-                    : "rounded-full border border-[#5f7362] px-3 py-1 text-xs font-semibold text-[#cbecd0]"
+                    : "rounded-full border border-[var(--control-border)] px-3 py-1 text-xs font-semibold text-[var(--control-soft)]"
                 }
               >
                 {active ? "Active" : "Use"}

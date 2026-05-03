@@ -108,14 +108,16 @@ export function ControlShell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <div className="flex min-h-0 flex-1">
-          {mobileNavOpen && (
-            <button
-              type="button"
-              aria-label="Close menu"
-              className="fixed inset-0 z-30 bg-black/45 backdrop-blur-sm md:hidden"
-              onClick={() => setMobileNavOpen(false)}
-            />
-          )}
+          <button
+            type="button"
+            aria-label="Close menu"
+            className={
+              mobileNavOpen
+                ? "fixed inset-0 z-30 bg-black/45 opacity-100 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+                : "pointer-events-none fixed inset-0 z-30 bg-black/45 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+            }
+            onClick={() => setMobileNavOpen(false)}
+          />
           <ControlSidebar
             collapsed={collapsed}
             mobileOpen={mobileNavOpen}

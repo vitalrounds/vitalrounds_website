@@ -32,10 +32,10 @@ export function ControlSidebar({
     <aside
       className={
         mobileOpen
-          ? "fixed inset-y-0 left-0 z-40 w-64 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:shadow-none"
+          ? "fixed inset-y-0 left-0 z-40 w-64 translate-x-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:shadow-none"
           : collapsed
-            ? "hidden w-16 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
-            : "hidden w-56 shrink-0 overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
+            ? "fixed inset-y-0 left-0 z-40 w-64 -translate-x-full overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:block md:w-16 md:translate-x-0 md:shrink-0 md:shadow-none md:transition-[width]"
+            : "fixed inset-y-0 left-0 z-40 w-64 -translate-x-full overflow-hidden border-r border-[var(--control-border)] bg-[var(--control-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:block md:w-56 md:translate-x-0 md:shrink-0 md:shadow-none md:transition-[width]"
       }
     >
       <nav

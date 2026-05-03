@@ -164,21 +164,23 @@ export function PartnerPortalShell({
         </header>
 
         <div className="flex min-h-0 flex-1">
-          {mobileNavOpen && (
-            <button
-              type="button"
-              aria-label="Close menu"
-              className="fixed inset-0 z-30 bg-black/45 backdrop-blur-sm md:hidden"
-              onClick={() => setMobileNavOpen(false)}
-            />
-          )}
+          <button
+            type="button"
+            aria-label="Close menu"
+            className={
+              mobileNavOpen
+                ? "fixed inset-0 z-30 bg-black/45 opacity-100 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+                : "pointer-events-none fixed inset-0 z-30 bg-black/45 opacity-0 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+            }
+            onClick={() => setMobileNavOpen(false)}
+          />
           <aside
             className={
               mobileNavOpen
-                ? "fixed inset-y-0 left-0 z-40 w-64 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:shadow-none"
+                ? "fixed inset-y-0 left-0 z-40 w-64 translate-x-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:shadow-none"
                 : collapsed
-                  ? "hidden w-16 shrink-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
-                  : "hidden w-60 shrink-0 overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] transition-[width] duration-300 ease-in-out md:block"
+                  ? "fixed inset-y-0 left-0 z-40 w-64 -translate-x-full overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:block md:w-16 md:translate-x-0 md:shrink-0 md:shadow-none md:transition-[width]"
+                  : "fixed inset-y-0 left-0 z-40 w-64 -translate-x-full overflow-hidden border-r border-[var(--partner-border)] bg-[var(--partner-surface-strong)] shadow-2xl transition-transform duration-300 ease-in-out md:static md:block md:w-60 md:translate-x-0 md:shrink-0 md:shadow-none md:transition-[width]"
             }
           >
             <nav
@@ -256,21 +258,21 @@ export function PartnerThemeSettings() {
             onClick={() => setTheme(option.id)}
             className={
               active
-                ? "rounded-2xl border border-[#759d7b] bg-[#354a38] p-5 text-left shadow-sm"
-                : "rounded-2xl border border-[#354a38] bg-[#2c3d2f] p-5 text-left transition hover:border-[#759d7b]"
+                ? "rounded-2xl border border-[#759d7b] bg-[var(--partner-active)] p-5 text-left shadow-sm"
+                : "rounded-2xl border border-[var(--partner-border)] bg-[var(--partner-surface)] p-5 text-left transition hover:border-[#759d7b] hover:bg-[var(--partner-hover)]"
             }
             aria-pressed={active}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-white">{option.title}</h2>
-                <p className="mt-2 text-sm leading-7 text-[#a6ccac]">{option.description}</p>
+                <h2 className="text-lg font-semibold text-[var(--partner-text)]">{option.title}</h2>
+                <p className="mt-2 text-sm leading-7 text-[var(--partner-muted)]">{option.description}</p>
               </div>
               <span
                 className={
                   active
                     ? "rounded-full bg-[#759d7b] px-3 py-1 text-xs font-semibold text-white"
-                    : "rounded-full border border-[#5f7362] px-3 py-1 text-xs font-semibold text-[#cbecd0]"
+                    : "rounded-full border border-[var(--partner-border)] px-3 py-1 text-xs font-semibold text-[var(--partner-soft)]"
                 }
               >
                 {active ? "Active" : "Use"}
