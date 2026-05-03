@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import {
@@ -120,13 +121,21 @@ export default function LoginForm({ controlOrigin }: LoginFormProps) {
       className="mx-auto max-w-md space-y-5 rounded-3xl border border-[#a6ccac] bg-white p-8 shadow-sm"
     >
       <div>
+        <Image
+          src="/logo.png"
+          alt="VitalRounds"
+          width={210}
+          height={48}
+          priority
+          className="mb-6 h-auto w-[170px]"
+        />
         <h1 className="text-2xl font-semibold text-[#2c3d2f]">
           {forgotMode ? "Reset password" : "Sign in"}
         </h1>
         <p className="mt-2 text-sm text-[#6e706e]">
           {forgotMode
             ? "Enter your email and we will send a secure password reset link."
-            : "Applicants, partners, and admins use the same login. You will be sent to the right secure workspace automatically."}
+            : "Access your secure VitalRounds workspace with your registered email and password."}
         </p>
       </div>
 
