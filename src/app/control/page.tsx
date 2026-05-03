@@ -12,8 +12,9 @@ export default async function ControlHomePage() {
   try {
     const admin = createServiceRoleClient();
     const { count } = await admin
-      .from("waitlist_submissions")
-      .select("id", { count: "exact", head: true });
+      .from("program_applications")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["submitted", "reviewing"]);
     pendingApplicants = count ?? 0;
   } catch {
     pendingApplicants = 0;
