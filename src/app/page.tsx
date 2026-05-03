@@ -39,29 +39,6 @@ const valueHighlights = [
   },
 ];
 
-const journeySteps = [
-  {
-    icon: "1",
-    title: "Join wait list",
-    detail: "Submit profile and core documents.",
-  },
-  {
-    icon: "2",
-    title: "Readiness review",
-    detail: "VitalRounds checks clarity and fit.",
-  },
-  {
-    icon: "3",
-    title: "Pathway match",
-    detail: "Potential placements are identified.",
-  },
-  {
-    icon: "4",
-    title: "Next step",
-    detail: "You receive practical direction and updates.",
-  },
-];
-
 const faqItems = [
   {
     q: "What is the VitalRounds wait list?",
@@ -296,22 +273,21 @@ export default function Home() {
           <RevealOnScroll className="mb-8 max-w-2xl">
             <h2 className="text-3xl font-semibold md:text-4xl">A clear pathway</h2>
             <p className="mt-3 text-base leading-7 text-[#5f7362]">
-              Four focused steps from wait list to real next action.
+              Four focused steps from wait list to clinical rounds.
             </p>
           </RevealOnScroll>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-            {journeySteps.map((step, index) => (
-              <RevealOnScroll key={step.title} delayMs={index * 90}>
-                <article className="rounded-2xl border border-[#bfd5c3] bg-[#ebf4ed]/70 p-4">
-                  <div className="mb-3 inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-[#759d7b] px-2 text-xs font-semibold text-white">
-                    {step.icon}
-                  </div>
-                  <h3 className="text-sm font-semibold text-[#354a38]">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-[#5f7362]">{step.detail}</p>
-                </article>
-              </RevealOnScroll>
-            ))}
-          </div>
+          <RevealOnScroll delayMs={120}>
+            <div className="overflow-hidden rounded-[2rem] border border-[#bfd5c3] bg-[#eef6ef]/75 p-2 shadow-sm backdrop-blur-sm">
+              <Image
+                src="/process-pathway.png"
+                alt="VitalRounds clear pathway from wait list to clinical rounds"
+                width={1024}
+                height={459}
+                className="block h-auto w-full rounded-[1.35rem]"
+                sizes="(max-width: 1024px) 100vw, 1024px"
+              />
+            </div>
+          </RevealOnScroll>
         </div>
       </section>
 
