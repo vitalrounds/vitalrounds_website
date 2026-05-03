@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import RevealOnScroll from "@/components/reveal-on-scroll";
+import ScrollFadeImage from "@/components/scroll-fade-image";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vitalrounds.com.au";
 
@@ -278,7 +279,7 @@ export default function Home() {
           </RevealOnScroll>
           <RevealOnScroll delayMs={120}>
             <div className="overflow-hidden rounded-[2rem] border border-[#bfd5c3] bg-[#eef6ef]/75 p-2 shadow-sm backdrop-blur-sm">
-              <Image
+              <ScrollFadeImage
                 src="/process-pathway.png"
                 alt="VitalRounds clear pathway from wait list to clinical rounds"
                 width={1024}
