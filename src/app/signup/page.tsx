@@ -1,9 +1,14 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import ApplicantSignupForm from "./signup-form";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Sign up | VitalRounds",
   description: "Create a VitalRounds applicant account and verify your email.",
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function SignupPage() {

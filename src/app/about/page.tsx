@@ -3,10 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About VitalRounds",
+  title: "About VitalRounds Clinical Observership Pathways",
   description:
-    "Learn about VitalRounds, our mission, our technology approach, and how we support observership pathways for doctors in Australia.",
+    "Learn how VitalRounds supports clinical observership programs, clinical exposure, and local clinical experience pathways for doctors in Australia, Victoria, and Melbourne.",
   alternates: { canonical: "/about" },
+  openGraph: {
+    url: "/about",
+    title: "About VitalRounds Clinical Observership Pathways",
+    description:
+      "VitalRounds supports doctors and IMGs seeking structured Australian clinical observership pathways and local clinical experience readiness.",
+  },
 };
 
 export default function AboutPage() {
@@ -47,7 +53,8 @@ export default function AboutPage() {
             </h1>
             <p className="max-w-[30rem] text-base leading-8 text-[#5f7362]">
               VitalRounds is a practical pathway platform for doctors and international medical
-              graduates seeking meaningful clinical exposure in Australian healthcare settings.
+              graduates seeking meaningful clinical exposure in Australian healthcare settings,
+              including Victoria and Melbourne pathways when suitable opportunities are available.
             </p>
           </div>
           <div className="relative lg:col-span-7">
@@ -72,7 +79,7 @@ export default function AboutPage() {
           <p className="mt-3 leading-8 text-[#5f7362]">
             VitalRounds is a coordination platform for observership pathways. We help structure
             applications, documentation, and communication so doctors can move from uncertainty to
-            clear next steps.
+            clear next steps toward clinical observership programs in Australia.
           </p>
         </article>
 
@@ -84,7 +91,8 @@ export default function AboutPage() {
               preparing for Australian practice. We know that IMG doctors, fresh medical graduates,
               and medical staff returning after personal gaps can get stuck in a no-clinical-
               exposure cycle, so we are building a clear, practical pathway that helps them move
-              forward with confidence toward Australian clinical readiness.
+              forward with confidence toward Australian clinical readiness, local clinical
+              experience, and AHPRA-aware preparation.
             </p>
           </div>
           <div className="relative overflow-hidden rounded-2xl bg-[#e5f3e8] p-4 md:col-span-4">
@@ -139,6 +147,17 @@ export default function AboutPage() {
               Better prepared doctors support safer care pathways and stronger team integration.
             </p>
           </div>
+        </article>
+
+        <article className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/65 p-6 backdrop-blur-sm">
+          <h2 className="text-2xl font-semibold">AMC, AHPRA, and Local Clinical Experience</h2>
+          <p className="mt-3 leading-8 text-[#5f7362]">
+            Many doctors prepare for AMC1 training, AMC2 training, AMC exams, and AHPRA registration
+            while also trying to close a local clinical experience gap. VitalRounds does not promise
+            exam results or replace formal AMC preparation. Our role is to help organize clinical
+            exposure pathways and Australian healthcare familiarity that can sit alongside those
+            professional goals.
+          </p>
         </article>
 
         <article className="rounded-[1.7rem] border border-[#bfd5c3] bg-gradient-to-r from-[#d5e7d9] via-[#dff0e3] to-[#d3e4d6] p-6">

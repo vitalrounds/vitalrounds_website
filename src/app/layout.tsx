@@ -23,10 +23,21 @@ export const metadata: Metadata = {
     template: "%s | VitalRounds",
   },
   description:
-    "VitalRounds supports international medical graduates with structured clinical observership programs and hospital exposure in Australian healthcare settings.",
+    "VitalRounds supports doctors and international medical graduates with clinical observership programs, clinical exposure, and local clinical experience pathways in Australia, Victoria, and Melbourne.",
   keywords: [
     "observership programs in Australia",
+    "observership programs in Victoria",
     "clinical observership Australia",
+    "clinical observership programs in Australia",
+    "clinical observership programs in Victoria",
+    "clinical observership programs in Melbourne",
+    "clinical exposure",
+    "local clinical experience",
+    "clinical experience gap",
+    "AMC1 training",
+    "AMC2 training",
+    "pass AMC exams",
+    "AHPRA",
     "IMG observership Australia",
     "international medical graduates Australia",
     "medical observership placement",
@@ -42,7 +53,7 @@ export const metadata: Metadata = {
     siteName: "VitalRounds",
     title: "VitalRounds | Clinical Observership Programs in Australia",
     description:
-      "Structured observership pathways for doctors and international medical graduates in Australian healthcare settings.",
+      "Structured observership pathways, clinical exposure, and local clinical experience support for doctors and international medical graduates in Australia, Victoria, and Melbourne.",
     images: [
       {
         url: "/clinical-network-poster.png",
@@ -54,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "VitalRounds | Clinical Observership Programs in Australia",
     description:
-      "Structured observership pathways for doctors and international medical graduates in Australian healthcare settings.",
+      "Structured observership pathways, clinical exposure, and local clinical experience support for doctors and international medical graduates in Australia, Victoria, and Melbourne.",
     images: ["/clinical-network-poster.png"],
   },
   robots: {

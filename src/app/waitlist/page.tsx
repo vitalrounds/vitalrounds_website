@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 import WaitlistForm from "./waitlist-form";
 
 export const metadata: Metadata = {
-  title: "Join the wait list | VitalRounds",
+  title: "Join the Clinical Observership Wait List",
   description:
-    "Tell us about your pathway and preferences to join the VitalRounds wait list.",
+    "Join the VitalRounds wait list for structured clinical observership programs, clinical exposure, and local clinical experience pathways in Australia.",
+  alternates: { canonical: "/waitlist" },
+  openGraph: {
+    url: "/waitlist",
+    title: "Join the Clinical Observership Wait List",
+    description:
+      "Submit your interest in VitalRounds clinical observership pathways and Australian clinical exposure opportunities.",
+  },
 };
 
 export default function WaitlistPage() {

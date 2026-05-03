@@ -6,11 +6,17 @@ import RevealOnScroll from "@/components/reveal-on-scroll";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vitalrounds.com.au";
 
 export const metadata: Metadata = {
-  title: "Clinical Observership Programs in Australia for IMGs",
+  title: "Clinical Observership Programs in Australia, Victoria & Melbourne",
   description:
-    "Join VitalRounds to access structured clinical observership pathways in Australia for international medical graduates and doctors preparing for local healthcare environments.",
+    "Join VitalRounds for structured clinical observership programs, clinical exposure, and local clinical experience pathways in Australia, Victoria, and Melbourne.",
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    url: "/",
+    title: "Clinical Observership Programs in Australia, Victoria & Melbourne",
+    description:
+      "Structured clinical observership pathways, clinical exposure, and local clinical experience support for doctors and IMGs in Australia.",
   },
 };
 
@@ -69,6 +75,14 @@ const faqItems = [
     q: "How are applicants matched?",
     a: "VitalRounds reviews submissions for completeness and fit, then coordinates potential placement pathways aligned to hospital requirements and applicant goals.",
   },
+  {
+    q: "Does VitalRounds support clinical observership programs in Victoria or Melbourne?",
+    a: "VitalRounds is building observership pathways for doctors seeking Australian clinical exposure, including interest in Victoria and Melbourne clinical environments where suitable opportunities become available.",
+  },
+  {
+    q: "Can observerships help with AMC or AHPRA readiness?",
+    a: "VitalRounds is not an AMC1 or AMC2 training course and cannot guarantee that applicants pass AMC exams. The platform focuses on clinical exposure, local clinical experience, and Australian healthcare familiarity that can complement AMC exam preparation and AHPRA readiness.",
+  },
 ];
 
 export default function Home() {
@@ -91,16 +105,38 @@ export default function Home() {
       name: "VitalRounds",
       url: siteUrl,
     },
-    areaServed: {
-      "@type": "Country",
-      name: "Australia",
-    },
+    areaServed: [
+      {
+        "@type": "Country",
+        name: "Australia",
+      },
+      {
+        "@type": "AdministrativeArea",
+        name: "Victoria",
+      },
+      {
+        "@type": "City",
+        name: "Melbourne",
+      },
+    ],
     audience: {
       "@type": "Audience",
       audienceType: "Doctors and international medical graduates",
     },
     description:
-      "Structured observership pathways and application review workflows for doctors seeking Australian clinical exposure.",
+      "Structured clinical observership pathways and application review workflows for doctors seeking clinical exposure, local clinical experience, and Australian healthcare readiness.",
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "VitalRounds",
+    url: siteUrl,
+    publisher: {
+      "@type": "Organization",
+      name: "VitalRounds",
+      url: siteUrl,
+    },
   };
 
   const faqJsonLd = {
@@ -135,6 +171,10 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
       <section className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-3 px-4 py-5 sm:px-6 sm:py-7 md:px-10">
         <Link href="/" className="inline-flex items-center gap-3">
@@ -188,7 +228,8 @@ export default function Home() {
             </h1>
             <p className="max-w-[30rem] text-base leading-8 text-[#5f7362]">
               A cleaner, more structured route for doctors closing local experience gaps and
-              preparing for Australian healthcare environments.
+              preparing for Australian healthcare environments, including interest in Victoria and
+              Melbourne clinical observership pathways.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Link
@@ -271,6 +312,32 @@ export default function Home() {
               </RevealOnScroll>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="py-14 md:py-16">
+        <div className="mx-auto max-w-6xl px-6 md:px-10">
+          <RevealOnScroll className="rounded-[1.7rem] border border-[#c8ddcb]/80 bg-[#f7fbf8]/70 p-6 backdrop-blur-sm md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#759d7b]">
+              Clinical exposure in Australia
+            </p>
+            <h2 className="mt-3 max-w-3xl text-3xl font-semibold text-[#2c3d2f] md:text-4xl">
+              Observership pathways for doctors closing a local clinical experience gap.
+            </h2>
+            <p className="mt-4 max-w-3xl text-base leading-8 text-[#5f7362]">
+              VitalRounds helps doctors and international medical graduates prepare a clearer
+              pathway toward Australian clinical exposure. Our focus is structured observership
+              program coordination, local clinical experience readiness, and hospital-facing
+              applicant information for opportunities across Australia, including Victoria and
+              Melbourne when suitable placements are available.
+            </p>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#5f7362]">
+              For candidates preparing around AMC1 training, AMC2 training, AMC exams, or AHPRA
+              registration requirements, VitalRounds is designed to support real-world clinical
+              familiarity and communication readiness. It does not replace formal exam training or
+              guarantee exam outcomes.
+            </p>
+          </RevealOnScroll>
         </div>
       </section>
 

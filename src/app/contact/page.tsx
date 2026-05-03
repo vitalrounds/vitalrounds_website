@@ -3,10 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Contact VitalRounds",
+  title: "Contact VitalRounds for Clinical Observership Programs",
   description:
-    "Contact VitalRounds for observership program enquiries, hospital partnerships, and applicant support.",
+    "Contact VitalRounds for clinical observership program enquiries, hospital partnerships, and applicant support in Australia, Victoria, and Melbourne.",
   alternates: { canonical: "/contact" },
+  openGraph: {
+    url: "/contact",
+    title: "Contact VitalRounds for Clinical Observership Programs",
+    description:
+      "Contact VitalRounds about clinical observership pathways, clinical exposure, local clinical experience, and partnership enquiries.",
+  },
 };
 
 export default function ContactPage() {
@@ -45,7 +51,8 @@ export default function ContactPage() {
             Let&apos;s discuss your observership pathway or partnership plans.
           </h1>
           <p className="mt-4 max-w-2xl leading-8 text-[#4f6553]">
-            Keep it simple: send one email, and we&apos;ll guide you to the right next step.
+            Keep it simple: send one email about clinical observership programs, clinical exposure,
+            or local clinical experience pathways, and we&apos;ll guide you to the right next step.
           </p>
         </div>
 

@@ -5,10 +5,20 @@ Primary offering: Clinical observership program pathways in Australia for doctor
 Key pages
 - Home: https://vitalrounds.com.au/
 - Join wait list: https://vitalrounds.com.au/waitlist
-- Login: https://vitalrounds.com.au/login
+- About VitalRounds: https://vitalrounds.com.au/about
+- Contact VitalRounds: https://vitalrounds.com.au/contact
 
 Summary
 VitalRounds supports doctors seeking clinical observership opportunities in Australia. The platform coordinates applicant submissions, document review, and hospital-facing workflows to help bridge local clinical exposure gaps.
+
+Primary topics and search intent
+- Clinical observership programs in Australia for doctors and international medical graduates.
+- Observership program interest in Victoria and Melbourne when suitable opportunities become available.
+- Clinical exposure, local clinical experience, and pathways for doctors trying to close a clinical experience gap.
+- Australian healthcare readiness for doctors preparing around AMC1 training, AMC2 training, AMC exams, and AHPRA requirements.
+
+Important clarification
+VitalRounds is not an AMC1 or AMC2 exam training provider and does not guarantee that applicants pass AMC exams. VitalRounds focuses on structured clinical observership pathways, clinical exposure, documentation, and local clinical experience readiness.
 
 Contact
 - admin@vitalrounds.com.au
